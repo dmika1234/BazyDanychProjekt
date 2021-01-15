@@ -120,7 +120,7 @@ CREATE TABLE komentarze (
 	id_uzytkownika INTEGER NOT NULL,
 	data DATE NOT NULL,
 	id_produkcji INTEGER NOT NULL,
-	id_odcinka INTEGER REFERENCES odcinki(id_odcinka)
+	id_odcinka INTEGER 
 );
 
 
