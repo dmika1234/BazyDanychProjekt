@@ -84,7 +84,7 @@ sink()
 
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
-                 user = "postgres", pass = "dell123987")
+                 user = "postgres", pass = "*******")
 
 
 
