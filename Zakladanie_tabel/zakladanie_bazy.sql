@@ -80,7 +80,7 @@ CREATE TABLE odcinki (
 
 DROP TABLE odtworzenia CASCADE;
 CREATE TABLE odtworzenia (
-	id_odtworzenia SERIAL PRIMARY KEY,
+	id_odtworzenia SERIAL,
 	id_uzytkownika INTEGER NOT NULL,
 	id_produkcji INTEGER NOT NULL,
 	moment_zatrzymania TIME NOT NULL,
