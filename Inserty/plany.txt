@@ -1,5 +1,0 @@
-INSERT INTO plany(nazwa_plau, max_osob, cena) VALUES('Podstawowy',2 , 34);
-INSERT INTO plany(nazwa_plau, max_osob, cena) VALUES('Standard',3, 43);
-INSERT INTO plany(nazwa_plau, max_osob, cena) VALUES('Premium',4, 52);
-INSERT INTO plany(nazwa_plau, max_osob, cena) VALUES('Rodzinny',6,60);
-INSERT INTO plany(nazwa_plau, max_osob, cena) VALUES('Single',1,28);
