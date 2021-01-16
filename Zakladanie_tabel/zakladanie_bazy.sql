@@ -23,7 +23,7 @@ CREATE TABLE plany (
 DROP TABLE uzytkownicy CASCADE;
 CREATE TABLE uzytkownicy (
 	id_uzytkownika SERIAL,
-	id_konta INTEGER NOT NULL,
+	id_konta INTEGER,
 	nazwa VARCHAR(20) NOT NULL,
 	czy_dziecko BOOLEAN NOT NULL DEFAULT '0'
 );
