@@ -13,7 +13,7 @@ BEGIN
 		WHERE u.id_konta = NEW.id_konta;
 	
 	
-	IF(liczba_uz = max_uz) THEN
+	IF(liczba_uz >= max_uz) THEN
 		RAISE EXCEPTION ’Liczba uzytkownikow nie moze przekroczyc maksymalnej!’;
 	ELSE
 		RETURN NEW;
