@@ -54,7 +54,7 @@ sink()
 
 
 #Konta=====================================================================================================================================
-email_platforms <- c("@gmail.com", "@gmail.com", "@gmail.com", "@gmail.com", "@gmail.com", "@onet.pl", "@wp.pl", "@o2.pl", "@yahoo.com")
+email_platforms <- c("@gmail.com", "@onet.pl", "@wp.pl", "@o2.pl", "@yahoo.com")
 znaki <- 1:61
 znaki[1:26] <- letters
 znaki[27:52] <- LETTERS
@@ -64,11 +64,16 @@ znaki <- as.character(znaki)
 ##
 sink(file = "konta.txt")
 
-for(i in 1:1000){
+mails <- 1:2000
+
+for(i in 1:2000){
   
-  email <- paste(randomWords(1),randomWords(1), sample(email_platforms, 1), sep = "")
+  email <- paste(randomWords(1),randomWords(1), sample(1:9, 1), sample(email_platforms, 1, prob = c(0.6, 0.13, 0.13, 0.13, 0.01)), sep = "")
+  while(email %in% unique(mails))
+    email <- paste(randomWords(1),randomWords(1), sample(1:9, 1), sample(email_platforms, 1), sep = "")
+  mails[i] <- email
   il_haslo <- sample(8:16)
-  haslo <- paste(sample(znaki, il_haslo, replace = TRUE), collapse = "")
+  haslo <- paste(sample(znaki, il_haslo, replace = TRUE), sample(1:9, 1), collapse = "")
   data <- sample(seq(as.Date('2013/01/01'), as.Date('2021/01/10'), by="day"), 1)
   id_planu <- sample(1:5, 1)
   
