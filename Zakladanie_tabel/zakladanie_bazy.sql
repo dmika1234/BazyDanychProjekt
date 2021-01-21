@@ -1,7 +1,7 @@
 DROP TABLE konta CASCADE;
 CREATE TABLE konta (
 	id_konta SERIAL,
-	email VARCHAR(50) NOT NULL,
+	email VARCHAR(50) NOT NULL UNIQUE,
 	haslo VARCHAR(50) NOT NULL,
 	data_zalozenia DATE NOT NULL,
 	id_planu INTEGER NOT NULL

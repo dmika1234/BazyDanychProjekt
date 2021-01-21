@@ -4,6 +4,9 @@ require(randomNames)
 require("RPostgres")
 require(data.table)
 
+con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
+                 host = "localhost", port = 5432, 
+                 user = "postgres", pass = "dell123987")
 
 
 
@@ -15,7 +18,7 @@ kraje <- c("Stany Zjednoczone","Stany Zjednoczone","Stany Zjednoczone","Stany Zj
            "Niemcy","Niemcy", "Dania", "Hong Kong", "Japonia", "Polska", "Szwecja", "Szwecja")
 
 
-il_seriali <- 5610
+
 
 kraje_produkcji <- sample(kraje, il_seriali, replace = TRUE)
 
@@ -24,32 +27,6 @@ write.table(kraje_produkcji, file = "kraje_produkcji.csv", quote = FALSE, row.na
 #======================================================================================================================================
 
 
-
-#Odcinki======================================================================================================================================
-
-sink(file = "odcinki.txt")
-
-for(i in 1:(il_seriali)){
-  
-  il_sezon <- sample(1:12, 1, prob = 12:1/78)
-  
-  for(j in 1:il_sezon){
-    
-    il_odc <- sample(1:24, 1)
-    
-    for(k in 1:il_odc){
-      
-      czas_trwania <- paste(sample(0:2, 1, prob = c(0.4, 0.5, 0.1)), sample(0:59, 1), sample(0:59, 1), sep = ":")
-      tytul <- paste0(as.character(randomWords(sample(2:4, 1))), collapse = " ")
-      cat(paste0("INSERT INTO odcinki(id_odcinka, nr_sezonu, nr_odcinka, dlugosc_odcinka, tytul_odcinka) VALUES (", i+18726, ",",
-                 j, ",", k, ",'", czas_trwania, "','",tytul, "');", "\n"))
-    }
-  }
-}
-sink()
-
-
-#======================================================================================================================================
 
 
 
@@ -64,16 +41,16 @@ znaki <- as.character(znaki)
 ##
 sink(file = "konta.txt")
 
-mails <- 1:2000
+mails <- 1:1000
 
-for(i in 1:2000){
+for(i in 1:1000){
   
   email <- paste(randomWords(1),randomWords(1), sample(1:9, 1), sample(email_platforms, 1, prob = c(0.6, 0.13, 0.13, 0.13, 0.01)), sep = "")
   while(email %in% unique(mails))
     email <- paste(randomWords(1),randomWords(1), sample(1:9, 1), sample(email_platforms, 1), sep = "")
   mails[i] <- email
   il_haslo <- sample(8:16)
-  haslo <- paste(sample(znaki, il_haslo, replace = TRUE), sample(1:9, 1), collapse = "")
+  haslo <- paste(c(sample(znaki, il_haslo, replace = TRUE), sample(1:9, 1)), collapse = "")
   data <- sample(seq(as.Date('2013/01/01'), as.Date('2021/01/10'), by="day"), 1)
   id_planu <- sample(1:5, 1)
   
@@ -87,9 +64,6 @@ sink()
 
 
 
-con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
-                 host = "localhost", port = 5432, 
-                 user = "postgres", pass = "*******")
 
 
 
@@ -113,13 +87,15 @@ write.table(czy_dla_dzieci, file = "czy_dla_dzieci.txt", quote = FALSE, col.name
 
 ##losowanie tabeli odcinki
 
-seriale.sql <- dbGetQuery(con, "SELECT * FROM produkcje WHERE czy_serial=TRUE;")
-liczba_seriali <- nrow(seriale.sql)
+seriale.sql <- dbGetQuery(con, "SELECT * FROM produkcje WHERE czy_serial = TRUE;")
 
+id_ser <- seriale.sql$id_produkcji
+
+il_seriali <- nrow(seriale.sql)
 
 sink(file = "odcinki.txt")
 
-for(i in 1:(liczba_seriali)){
+for(i in 1:(il_seriali)){
   
   liczba_sezon <- sample(1:12, 1, prob = c(30, 20, 10:1), replace = TRUE)
   
@@ -131,7 +107,7 @@ for(i in 1:(liczba_seriali)){
       
       czas_trwania <- paste(sample(0:2, 1, prob = c(0.4, 0.5, 0.1)), sample(0:59, 1, replace = TRUE), sample(0:59, 1, replace = TRUE), sep = ":")
       tytul <- paste0(as.character(randomWords(sample(2:4, 1, replace = TRUE))), collapse = " ")
-      cat(paste0("INSERT INTO odcinki(id_produkcji, nr_sezonu, nr_odcinka, dlugosc_odcinka, tytul_odcinka) VALUES (", i+18725, ",",
+      cat(paste0("INSERT INTO odcinki(id_produkcji, nr_sezonu, nr_odcinka, dlugosc_odcinka, tytul_odcinka) VALUES (", id_ser[i], ",",
                  j, ",", k, ",'", czas_trwania, "','",tytul, "');", "\n"))
     }
   }
@@ -139,26 +115,26 @@ for(i in 1:(liczba_seriali)){
 sink()
 
 
-##losowanie tabeli w_kategorii dla seriali
+##losowanie tabeli w_kategorii
 
 
-seriale.sql <- dbGetQuery(con, "SELECT * FROM produkcje WHERE czy_serial=TRUE;")
+produkcje.sql <- dbGetQuery(con, "SELECT * FROM produkcje;")
 kategorie.sql <- dbGetQuery(con, "SELECT * FROM kategorie;")
 
-liczba_seriali <- nrow(seriale.sql)
+liczba_produkcji <- nrow(produkcje.sql)
 liczba_kategorii <- nrow(kategorie.sql)
 
-sink(file = "w_kategorii_seriale.txt")
+sink(file = "w_kategorii.txt")
 
 
 
-for(i in 1:(liczba_seriali)){
+for(i in 1:(liczba_produkcji)){
   
   a <- sample(1:liczba_kategorii, 3, replace = FALSE)
   
-  cat(paste0("INSERT INTO w_kategorii(id_produkcji, id_kategorii) VALUES (", seriale.sql$id_produkcji[i], ",", a[1], "); \n"))
-  cat(paste0("INSERT INTO w_kategorii(id_produkcji, id_kategorii) VALUES (", seriale.sql$id_produkcji[i], ",", a[2], "); \n"))
-  cat(paste0("INSERT INTO w_kategorii(id_produkcji, id_kategorii) VALUES (", seriale.sql$id_produkcji[i], ",", a[3], "); \n"))
+  cat(paste0("INSERT INTO w_kategorii(id_produkcji, id_kategorii) VALUES (", produkcje.sql$id_produkcji[i], ",", a[1], "); \n"))
+  cat(paste0("INSERT INTO w_kategorii(id_produkcji, id_kategorii) VALUES (", produkcje.sql$id_produkcji[i], ",", a[2], "); \n"))
+  cat(paste0("INSERT INTO w_kategorii(id_produkcji, id_kategorii) VALUES (", produkcje.sql$id_produkcji[i], ",", a[3], "); \n"))
 }
 
 sink()
@@ -192,7 +168,7 @@ for(i in 1:liczba_kont){
 sink()
 
 
-View(unique(randomWords(100)))
+
 
 
 
@@ -528,7 +504,6 @@ for (i in 1:liczba_kont){
   
   
 }
-
 sink()
 
 
