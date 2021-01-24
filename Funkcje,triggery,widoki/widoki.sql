@@ -1,24 +1,20 @@
 --Top produkcji--
-SELECT round(avg(ocena), 2), id_produkcji
-FROM oceny
-GROUP BY id_produkcji
-HAVING COUNT(ocena)>10
-ORDER BY avg(ocena) DESC
+DROP VIEW top_produkcji;
+CREATE VIEW top_produkcji AS
+SELECT p.tytul, round(avg(ocena), 2) AS "Srednia ocen"
+FROM oceny o
+JOIN produkcje p ON o.id_produkcji = p.id_produkcji
+GROUP BY o.id_produkcji, p.tytul
+HAVING COUNT(o.ocena)>10
+ORDER BY avg(o.ocena) DESC
 LIMIT 10;
 --
+
+
+
+--wgląd w produkcje--
+
+
+
+
 --
-SELECT id_produkcji, COUNT(ocena)
-FROM oceny
-GROUP BY id_produkcji
-ORDER BY COUNT(ocena) DESC;
-----
-
-SELECT count(*)
-FROM oceny;
-
-
-
-SELECT email, COUNT(id_konta)
-FROM konta
-GROUP BY email
-ORDER BY COUNT(id_konta) DESC;
