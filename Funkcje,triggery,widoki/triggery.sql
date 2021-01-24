@@ -118,3 +118,70 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER tr ON platnosci;
 CREATE TRIGGER tr BEFORE INSERT OR UPDATE ON  FOR EACH ROW EXECUTE PROCEDURE ();
+
+
+
+
+
+
+
+
+--trigger sprawdzający, że data utworzenia komentarza jest późniejsza niż data założenia konta
+
+CREATE OR REPLACE FUNCTION com_date_check() RETURNS TRIGGER AS $$
+DECLARE
+	data_zal DATE;
+
+BEGIN
+	SELECT data_zalozenia INTO data_zal 
+	FROM konta k
+	JOIN uzytkownicy u ON u.id_konta = k.id_konta
+	WHERE u.id_uzytkownika = NEW.id_uzytkownika;
+	
+	IF(data_zal > NEW.data) THEN
+		RAISE EXCEPTION 'Data dodania komentarza jest pozniejsza niz data zlozenia konta!';
+	ELSE
+		RETURN NEW;
+	END IF;	
+
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER tr_com_date_check ON komentarze;
+CREATE TRIGGER tr_com_date_check BEFORE INSERT OR UPDATE ON komentarze FOR EACH ROW EXECUTE PROCEDURE com_date_check();
+
+
+INSERT INTO komentarze(tresc, id_uzytkownika, data, id_produkcji ) VALUES('aaaa', 1, '2019-11-25', 1);
+UPDATE komentarze SET data = '2018-01-01' WHERE id_komentarza = 12005;
+
+
+
+
+--trigger sprawdzający, że komentujemy odcinek a nie produkcję
+
+
+CREATE OR REPLACE FUNCTION com_check() RETURNS TRIGGER AS $$
+DECLARE
+	id_p INTEGER;
+
+BEGIN
+	IF(NEW.id_odcinka IS NULL) THEN
+		RETURN NEW;
+	
+	ELSE
+		SELECT id_produkcji INTO id_p 
+		FROM odcinki 
+		WHERE id_odcinka = NEW.id_odcinka;
+		
+		IF(NEW.id_produkcji = id_p) THEN
+			RETURN NEW;
+		ELSE
+			RAISE EXCEPTION 'Zle id_produkcji';
+		END IF;
+	END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER tr_com_check ON komentarze;
+CREATE TRIGGER tr_com_check BEFORE INSERT OR UPDATE ON komentarze FOR EACH ROW EXECUTE PROCEDURE com_check();
