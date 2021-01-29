@@ -5,11 +5,13 @@ library(data.table)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
+require(RPostgres)
+require(data.table)
 library(shinyBS)
-require("RPostgres")
 
 
 #=======================================================
+
 
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
@@ -32,7 +34,12 @@ setnames(plans_modal,
 
 plans_modal <- plans_modal[, -1]
 plans <- dbGetQuery(con, "SELECT nazwa_planu FROM plany;")
-which(plans$nazwa_planu=="Podstawowy")
+
+
+
+top_f <- dbGetQuery(con, "SELECT * FROM top_filmow;") 
+top_s <- dbGetQuery(con, "SELECT * FROM top_seriali;")
+
 #===========================================
 
 
@@ -40,21 +47,20 @@ which(plans$nazwa_planu=="Podstawowy")
 
 
 # Main login screen
-loginpage <- div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;",
+loginpage <- tags$div(id = "loginpage", style = "width: 500px; max-width: 100%; margin: 0 auto; padding: 20px;", 
+                      fluidRow(
                  #Logowanie==
                  wellPanel(
-                   tags$h2("Zaloguj sie", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                   tags$h2("Logowanie", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                    textInput("userName", placeholder="E-mail", label = tagList(icon("user"), "E-mail")),
                    passwordInput("passwd", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Haslo")),
                    br(),
                    div(
                      style = "text-align: center;",
-                     actionButton("login", "Zaloguj sie", style = "color: white; background-color:#3c8dbc;
-                                 padding: 10px 15px; width: 150px; cursor: pointer;
-                                 font-size: 18px; font-weight: 600;"),
+                     actionButton("login", "Zaloguj", style = "color: white; font-weight: 600;"),
                      shinyjs::hidden(
                        div(id = "nomatch",
-                           tags$p("Oops! Incorrect username or password!",
+                           tags$p("Ups! Błędny login lub hasło!",
                                   style = "color: red; font-weight: 600; 
                                             padding-top: 5px;font-size:16px;", 
                                   class = "text-center"))),
@@ -68,7 +74,7 @@ loginpage <- div(id = "loginpage", style = "width: 500px; max-width: 100%; margi
                  
                  #Rejestracja==
                  wellPanel(
-                   tags$h2("Nie masz konta? Zarejestruj sie", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                   tags$h2(HTML('Nie masz konta? <br/> Zarejestruj sie'), class = "text-center", style = "padding-top: 0; font-weight:600;"),
                    textInput("reg_email", placeholder="E-mail", label = tagList(icon("user"), "E-mail")),
                    passwordInput("reg_passwd", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Haslo")),
                    passwordInput("reg_passwd2", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Powtorz haslo")),
@@ -79,11 +85,9 @@ loginpage <- div(id = "loginpage", style = "width: 500px; max-width: 100%; margi
                    br(),
                    div(
                      style = "text-align: center;",
-                     actionButton("reg_butt", "Zarejestruj sie", style = "color: white; background-color:#3c8dbc;
-                                 padding: 10px 15px; width: 150px; cursor: pointer;
-                                 font-size: 18px; font-weight: 600;")
-                     
-                   ))
+                     actionButton("reg_butt", "Zarejestruj sie", style = "color: white; font-weight: 600;")
+            
+                   )))
 )
 
 
@@ -94,14 +98,27 @@ credentials = data.table(
   stringsAsFactors = F
 )
 
-
+?textInput
 
 
 header <- dashboardHeader( title = "Simple Dashboard", uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
-body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"))
-ui<-dashboardPage(header, sidebar, body, skin = "blue")
+
+body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"),
+                      shinyDashboardThemes(
+                        theme = "flat_red"
+                      ))
+
+ui<-dashboardPage(header, sidebar, body)
+
+
+
+
+
+
+
+
 
 server <- function(input, output, session) {
   
@@ -110,6 +127,7 @@ server <- function(input, output, session) {
   
   observe({ 
     if (USER$login == FALSE) {
+      shinyjs::addClass(selector = "body", class = "sidebar-collapse")
       if (!is.null(input$login)) {
         if (input$login > 0) {
           Username <- isolate(input$userName)
@@ -133,55 +151,37 @@ server <- function(input, output, session) {
     }    
   })
   
+
   
   
-  
- 
   
   observeEvent(input$reg_butt, {
-    
     
     if(input$reg_passwd2 != input$reg_passwd){
       showNotification(paste0("Hasla nie pasuja!"), type = 'err')
       
     }
     else{
-        
       tryCatch({
-        res <- dbSendQuery(con, paste0("SELECT utworz_konto('",
-                                       input$reg_email,"', '",
-                                       input$reg_passwd, "','", input$reg_plan, "');"))
-        
-      },
-      error = function(err){
-        showNotification(paste0(err), type = 'err')
-      })
+      res <- dbSendQuery(con, paste0("SELECT utworz_konto('",
+                            input$reg_email,"', '", input$reg_passwd, "','", input$reg_plan, "');"))
+    },
+    error = function(err){
+      showNotification(paste0("Podany email nie istnieje!"), type = 'err')
+        })
       
-    showNotification("GITUWA", type = "message")
-      
+    showNotification("GITUWA", type = "message") 
     }
-    
-    
-    
-    })
-  
-
-  
+  })
   
 
   output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE))
   
   
   
-  
-  
-  
-  
-  
-  
   output$logoutbtn <- renderUI({
     req(USER$login)
-    tags$li(a(icon("fa fa-sign-out"), "Logout", 
+    tags$li(a(icon("sign-out"), "Logout", 
               href="javascript:window.location.reload(true)"),
             class = "dropdown", 
             style = "background-color: #eee !important; border: 0;
@@ -190,18 +190,68 @@ server <- function(input, output, session) {
   
   output$sidebarpanel <- renderUI({
     if (USER$login == TRUE ){ 
-      sidebarMenu(
-        menuItem("Main Page", tabName = "dashboard", icon = icon("dashboard"))
+      
+      shinyjs::removeClass(selector = "body", class = "sidebar-collapse")
+      
+      sidebarMenu(id="tab",
+                  menuItem("Konto", tabName="konto", icon = icon("dashboard")),
+                  menuItem("Ogladaj dalej", tabName = "ogladanie", icon =  icon("bar-chart-o")),
+                  menuItem("Twoje komentarze", tabName = "komentarze", icon =  icon("list-alt")),
+                  menuItem("Top listy", tabName = "topy", icon = icon("line-chart")),
+                  menuItem("Top listy", tabName = "dashboard", icon = icon("sign-out"))
       )
     }
   })
   
+  
+ 
+  
+  
+  
   output$body <- renderUI({
     if (USER$login == TRUE ) {
-      tabItem(tabName ="dashboard", class = "active",
-              fluidRow(
-                box(width = 12, dataTableOutput('results'))
-              ))
+      tabItems(
+        tabItem(tabName ="konto", class = "active",
+                fluidRow(
+                  box(width = 12, dataTableOutput('results'))
+                )),
+        tabItem(tabName ="ogladanie", class = "active",
+               h2("asdklj")),
+        
+        tabItem(tabName ="komentarze", class = "active",
+                h2("sdlkj")),
+        
+        tabItem(tabName ="topy", class = "active",
+                fluidRow(
+                  box(width = 6,
+                      radioGroupButtons(
+                        inputId = "Id064",
+                        label = "Kategorie",
+                        choices = c("Wszystkie",
+                                    "Animowany", "Biograficzny", "Dokumentalny", 
+                                    "Dramat", "Historyczny",
+                                    "Horror"  , "Komedia", "Musical", "Romantyczny",
+                                    "Sci-fi", "Thriller", "Western")
+                      ),
+                      dataTableOutput('top_filmy')),
+                      box(width = 6, 
+                          radioGroupButtons(
+                        inputId = "Id064",
+                        label = "Label",
+                        choices = c("Wszystkie",
+                                    "Animowany", "Biograficzny", "Dokumentalny", 
+                                    "Dramat", "Historyczny",
+                                    "Horror"  , "Komedia", "Musical", "Romantyczny",
+                                    "Sci-fi", "Thriller", "Western")
+                          ),
+                        dataTableOutput('top_seriale'))
+                        
+                        )
+                )
+      )
+      
+      
+      
     }
     else {
       loginpage
@@ -213,6 +263,29 @@ server <- function(input, output, session) {
                                    searching = FALSE))
   })
   
-}
+
+
+  
+  output$top_filmy  <-  DT::renderDataTable({
+    datatable(top_f, options = list(width = 5,
+                                  searching = FALSE))
+  })
+  
+  output$top_seriale  <-  DT::renderDataTable({
+    datatable(top_s, options = list(width = 5,
+                                    searching = FALSE))
+  })
+  
+  
+  
+}  
+
+
+  
+shinyWidgetsGallery()
+  
+  
+
+
 
 runApp(list(ui = ui, server = server))
