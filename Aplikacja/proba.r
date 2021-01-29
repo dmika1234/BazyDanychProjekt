@@ -62,7 +62,7 @@ loginpage <- div(id = "loginpage", style = "width: 500px; max-width: 100%; margi
                  
                  #Rejestracja==
                  wellPanel(
-                   tags$h2("Zarejestruj sie", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
+                   tags$h2("Nie masz konta? Zarejestruj sie", class = "text-center", style = "padding-top: 0;color:#333; font-weight:600;"),
                    textInput("reg_email", placeholder="E-mail", label = tagList(icon("user"), "E-mail")),
                    passwordInput("reg_passwd", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Haslo")),
                    passwordInput("reg_passwd2", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Powtorz haslo")),
@@ -128,14 +128,24 @@ server <- function(input, output, session) {
   
   observeEvent(input$reg_butt, {
     
-    dbSendQuery(con, paste0("SELECT utworz_konto('",
+    if(input$reg_passwd2 != input$reg_passwd){
+      showNotification(paste0("Hasla nie pasuja!"), type = 'err')
+      
+    }
+    else{
+      tryCatch({
+      res <- dbSendQuery(con, paste0("SELECT utworz_konto('",
                             input$reg_email,"', '", input$reg_passwd, "','", input$reg_plan, "');"))
+    },
+    error = function(err){
+      showNotification(paste0(err), type = 'err')
+        })
+      
+    }
   })
   
 
-  
-  
-  
+
   
   
   
