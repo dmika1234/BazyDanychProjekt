@@ -12,7 +12,7 @@ LIMIT 10;
 
 
 
---Top produkcji--
+--Top filmow--
 DROP VIEW top_filmow;
 CREATE VIEW top_filmow AS
 SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen"
@@ -25,7 +25,7 @@ ORDER BY avg(o.ocena) DESC;
 --
 
 
---Top produkcji--
+--Top seriali--
 DROP VIEW top_seriali;
 CREATE VIEW top_seriali AS
 SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen"
