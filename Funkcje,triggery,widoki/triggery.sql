@@ -226,3 +226,26 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER tr_com_check ON komentarze;
 CREATE TRIGGER tr_com_check BEFORE INSERT OR UPDATE ON komentarze FOR EACH ROW EXECUTE PROCEDURE com_check();
+
+
+
+
+CREATE OR REPLACE FUNCTION odcinki_check() RETURNS TRIGGER AS $$
+DECLARE
+	krotka RECORD;
+BEGIN
+	SELECT * INTO krotka FROM odcinki 
+	WHERE id_produkcji = NEW.id_produkcji 
+		AND nr_sezonu = NEW.nr_sezonu
+		AND nr_odcinka = NEW.nr_odcinka;
+		
+	IF(FOUND) THEN RAISE EXCEPTION 'Istnieje już taki odcinek';
+	ELSE
+	RETURN NEW;
+	END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER odcinki_check ON odcinki;
+CREATE TRIGGER odcinki_check BEFORE INSERT OR UPDATE ON odcinki FOR EACH ROW EXECUTE PROCEDURE odcinki_check();
