@@ -8,6 +8,8 @@ library(shinyWidgets)
 require(RPostgres)
 require(data.table)
 library(shinyBS)
+library(dashboardthemes)
+
 
 
 #=======================================================
@@ -175,7 +177,7 @@ server <- function(input, output, session) {
   })
   
 
-  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE))
+  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE))
   
   
   
@@ -213,7 +215,7 @@ server <- function(input, output, session) {
       tabItems(
         tabItem(tabName ="konto", class = "active",
                 fluidRow(
-                  box(width = 12, dataTableOutput('results'))
+                  
                 )),
         tabItem(tabName ="ogladanie", class = "active",
                h2("asdklj")),
@@ -257,12 +259,7 @@ server <- function(input, output, session) {
       loginpage
     }
   })
-  
-  output$results <-  DT::renderDataTable({
-    datatable(iris, options = list(autoWidth = TRUE,
-                                   searching = FALSE))
-  })
-  
+
 
 
   
@@ -281,10 +278,6 @@ server <- function(input, output, session) {
 }  
 
 
-  
-shinyWidgetsGallery()
-  
-  
 
 
 
