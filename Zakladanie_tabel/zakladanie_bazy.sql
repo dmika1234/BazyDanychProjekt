@@ -12,7 +12,7 @@ CREATE TABLE konta (
 DROP TABLE plany CASCADE;
 CREATE TABLE plany (
 	id_planu SERIAL,
-	nazwa_plau VARCHAR(20) NOT NULL,
+	nazwa_planu VARCHAR(20) NOT NULL,
 	max_osob INTEGER NOT NULL,
 	cena DECIMAL(5,2) NOT NULL
 );
