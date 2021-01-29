@@ -5,11 +5,11 @@ library(data.table)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
+library(shinyBS)
 require("RPostgres")
-require(data.table)
+
 
 #=======================================================
-
 
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
@@ -23,10 +23,17 @@ users <- us$email
 
 passwords <- us$haslo
 
+plans_modal <- as.data.table(dbGetQuery(con, "SELECT * FROM plany;"))
+
+plans_modal[, cena := paste(cena, "zl", sep = " ")]
+setnames(plans_modal,
+         old = c("nazwa_planu", "max_osob", "cena"),
+         new = c("Nazwa planu", "Maksymalna liczba uzytkownikow", "Cena"))
+
+plans_modal <- plans_modal[, -1]
 plans <- dbGetQuery(con, "SELECT nazwa_planu FROM plany;")
 
 
-plans
 #===========================================
 
 
@@ -67,13 +74,16 @@ loginpage <- div(id = "loginpage", style = "width: 500px; max-width: 100%; margi
                    passwordInput("reg_passwd", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Haslo")),
                    passwordInput("reg_passwd2", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Powtorz haslo")),
                    selectInput("reg_plan", "Wybierz plan z listy", choices = plans),
+                   actionButton("about_plan", "Dowiedz sie wiecej o planach"),
+                   bsModal("modalExample", "Data Table", "about_plan", size = "large",
+                           dataTableOutput("tbl")),
                    br(),
                    div(
                      style = "text-align: center;",
                      actionButton("reg_butt", "Zarejestruj sie", style = "color: white; background-color:#3c8dbc;
                                  padding: 10px 15px; width: 150px; cursor: pointer;
                                  font-size: 18px; font-weight: 600;")
-            
+                     
                    ))
 )
 
@@ -125,27 +135,36 @@ server <- function(input, output, session) {
   })
   
   
-  
   observeEvent(input$reg_butt, {
+    
     
     if(input$reg_passwd2 != input$reg_passwd){
       showNotification(paste0("Hasla nie pasuja!"), type = 'err')
       
     }
     else{
+        
       tryCatch({
-      res <- dbSendQuery(con, paste0("SELECT utworz_konto('",
-                            input$reg_email,"', '", input$reg_passwd, "','", input$reg_plan, "');"))
-    },
-    error = function(err){
-      showNotification(paste0(err), type = 'err')
-        })
+        res <- dbSendQuery(con, paste0("INSERT INTO konta('",
+                                       input$reg_email,"', '", input$reg_passwd, "','", input$reg_plan, "');"))
+        
+      },
+      error = function(err){
+        showNotification(paste0("Podany email nie istnieje!"), type = 'err')
+      })
+      
+    showNotification("GITUWA", type = "message")
       
     }
   })
   
 
-
+  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE))
+  
+  
+  
+  
+  
   
   
   
