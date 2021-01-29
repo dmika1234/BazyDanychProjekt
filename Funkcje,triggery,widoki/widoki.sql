@@ -12,6 +12,34 @@ LIMIT 10;
 
 
 
+--Top produkcji--
+DROP VIEW top_filmow;
+CREATE VIEW top_filmow AS
+SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen"
+FROM oceny o
+	JOIN produkcje p ON o.id_produkcji = p.id_produkcji
+WHERE p.czy_serial = FALSE
+GROUP BY o.id_produkcji, p.tytul
+	HAVING COUNT(o.ocena)>10
+ORDER BY avg(o.ocena) DESC;
+--
+
+
+--Top produkcji--
+DROP VIEW top_seriali;
+CREATE VIEW top_seriali AS
+SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen"
+FROM oceny o
+	JOIN produkcje p ON o.id_produkcji = p.id_produkcji
+WHERE p.czy_serial = TRUE
+GROUP BY o.id_produkcji, p.tytul
+	HAVING COUNT(o.ocena)>10
+ORDER BY avg(o.ocena) DESC;
+--
+
+
+
+
 --wgląd w filmy--
 DROP VIEW info_filmy;
 CREATE VIEW info_filmy AS
