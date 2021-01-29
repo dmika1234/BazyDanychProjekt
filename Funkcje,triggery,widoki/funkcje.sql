@@ -15,6 +15,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION skomentuj_film(id_pop INTEGER, tr TEXT, id_u INTEGER, id_p INTEGER) RETURNS VOID AS $$
 BEGIN
+
 	INSERT INTO komentarze(id_pop_kom, tresc, id_uzytkownika, data, id_produkcji) VALUES(id_pop, tr, id_u, CURRENT_DATE, id_p);
 
 END;
@@ -25,6 +26,7 @@ CREATE OR REPLACE FUNCTION skomentuj_serial(id_pop INTEGER, tr TEXT, id_u INTEGE
 DECLARE
 	id_p INTEGER;
 BEGIN
+
 	SELECT id_produkcji INTO id_p FROM odcinki WHERE id_odcinka = id_o;
 	INSERT INTO komentarze(id_pop_kom, tresc, id_uzytkownika, data, id_produkcji, id_odcinka) VALUES(id_pop, tr, id_u, CURRENT_DATE, id_p, id_o);
 END;
@@ -124,3 +126,17 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT * FROM top(2);
+
+
+
+--Tworzenie konta--
+CREATE OR REPLACE FUNCTION utworz_konto(em VARCHAR(255), ha VARCHAR(255), nazwa_pl VARCHAR(20)) RETURNS VOID AS $$
+DECLARE
+id_p INTEGER;
+BEGIN
+	SELECT id_planu INTO id_p FROM plany WHERE nazwa_planu = nazwa_pl;
+	INSERT INTO konta (email, haslo, data_zalozenia, id_planu) VALUES (em, ha, CURRENT_DATE, id_p);
+
+END;
+$$ LANGUAGE plpgsql;
+------

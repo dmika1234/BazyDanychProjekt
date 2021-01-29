@@ -122,6 +122,47 @@ CREATE TRIGGER tr BEFORE INSERT OR UPDATE ON  FOR EACH ROW EXECUTE PROCEDURE ();
 
 
 
+--Sprawdzenie czy mail jest faktycznie mailem--
+CREATE OR REPLACE FUNCTION czy_mail() RETURNS TRIGGER AS $$
+
+BEGIN 
+
+	IF NEW.email !~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$' THEN
+		RAISE EXCEPTION 'Podany email nie istnieje!';
+	ELSE
+		RETURN NEW;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER tr_czy_mail ON konta;
+CREATE TRIGGER tr_czy_mail BEFORE INSERT OR UPDATE ON konta FOR EACH ROW EXECUTE PROCEDURE czy_mail();
+--Sprawdzenie--
+INSERT INTO konta (email, haslo, data_zalozenia, id_planu) VALUES ('hisdepicts@onet.pl', '1234', CURRENT_DATE, 2);
+---
+
+--Sprawdzenie czy podany mail nie jest już w bazie--
+CREATE OR REPLACE FUNCTION mail_check() RETURNS TRIGGER AS $$
+
+BEGIN
+	
+	IF EXISTS(SELECT email FROM konta WHERE email = NEW.email) THEN
+		RAISE EXCEPTION 'Konto o podanym emailu istnieje!';
+	ELSE
+		RETURN NEW;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER tr_mail_check ON konta;
+CREATE TRIGGER tr_mail_check BEFORE INSERT OR UPDATE ON konta FOR EACH ROW EXECUTE PROCEDURE mail_check();
+--Sprawdzenie--
+INSERT INTO konta (email, haslo, data_zalozenia, id_planu) VALUES ('asd', '1234', CURRENT_DATE, 2);
+---
+
+
+
+
 
 
 
