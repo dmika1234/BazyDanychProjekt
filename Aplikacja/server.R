@@ -148,11 +148,13 @@ function(input, output, session) {
                 fluidRow(
                   tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                   radioGroupButtons(
-                    inputId = "Id068",
+                    inputId = "wybor_u",
                     choices = uzytkownicy_konta()$nazwa,
-                    size = "lg",
-                    width = 100,
-                    direction = "horizontal"
+                    size='lg',
+                    direction = "horizontal",
+                    justified = TRUE,
+                    width = '100%',
+                    individual = TRUE
                   )
                   
                 )),
