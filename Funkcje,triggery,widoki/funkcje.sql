@@ -130,13 +130,18 @@ SELECT * FROM top(2);
 
 
 --Tworzenie konta--
-CREATE OR REPLACE FUNCTION utworz_konto(em VARCHAR(255), ha VARCHAR(255), nazwa_pl VARCHAR(20)) RETURNS VOID AS $$
+DROP FUNCTION utworz_konto;
+
+CREATE OR REPLACE FUNCTION utworz_konto(em VARCHAR(255), ha VARCHAR(255), nazwa_pl VARCHAR(20)) RETURNS BOOLEAN AS $$
 DECLARE
 id_p INTEGER;
+id_k INTEGER;
 BEGIN
 	SELECT id_planu INTO id_p FROM plany WHERE nazwa_planu = nazwa_pl;
-	INSERT INTO konta (email, haslo, data_zalozenia, id_planu) VALUES (em, ha, CURRENT_DATE, id_p);
-
+	SELECT max(id_konta)+1 INTO id_k FROM konta;
+	INSERT INTO konta (id_konta, email, haslo, data_zalozenia, id_planu) VALUES (id_k, em, ha, CURRENT_DATE, id_p);
+	INSERT INTO uzytkownicy (id_konta, nazwa, czy_dziecko) VALUES (id_k, 'kot1', FALSE);
+	RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;
 ------
