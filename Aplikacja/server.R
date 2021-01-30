@@ -25,8 +25,22 @@ function(input, output, session) {
        passod   = passwords,
       stringsAsFactors = F)
   })
-
-  
+   
+   
+   us <- reactive({
+     
+     as.data.table(dbGetQuery(con, "SELECT id_konta, haslo, email FROM konta;"))
+     
+   })
+   
+   uzytkownicy_konta <- reactive({
+     
+     id_konta <- us()[us()$email == input$userName]$id_konta
+     dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta, "';"))
+     
+   })  
+   
+  v <- reactiveValues()
   
 #Panel Logowanie==============================================================================================================================  
   
@@ -78,18 +92,10 @@ function(input, output, session) {
         showNotification(paste0("Podany e-mail nie istnieje!"), type = 'err')
       })
       
+      
       showNotification("GITUWA", type = "message") 
     }
-    
-    
-    us <- as.data.table(dbGetQuery(con, "SELECT id_konta, haslo, email FROM konta;"))
-    users <- us$email
-    passwords <- us$haslo
-    
-    credentials <- data.table(
-      username_id = users,
-      passod   = passwords, 
-      stringsAsFactors = F)
+ 
     
   })
 
@@ -131,19 +137,7 @@ function(input, output, session) {
 #===============================================================================================================================================
   
   
-  
-uzytkownicy_konta <- reactive({
-  
-  id_konta <- us[email == input$userName, id_konta]
-  dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = ", id_konta, ";"))
-  
-  
-})  
 
-  
-  
-  
-  
     
   
 #Główna treść apki=============================================================================================================================== 
