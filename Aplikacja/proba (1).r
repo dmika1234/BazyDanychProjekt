@@ -15,7 +15,7 @@ library("shinyBS")
 
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
-                 user = "postgres", pass = "IryaStist")
+                 user = "postgres", pass = "dell123987")
 
 
 
@@ -98,8 +98,6 @@ credentials = data.table(
   stringsAsFactors = F
 )
 
-?textInput
-
 
 header <- dashboardHeader( title = "Simple Dashboard", uiOutput("logoutbtn"))
 
@@ -114,8 +112,6 @@ ui<-dashboardPage(header, sidebar, body)
 
 
 
-
-?shinyDashboardThemes
 
 
 
