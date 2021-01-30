@@ -9,13 +9,13 @@ require("RPostgres")
 require(data.table)
 library("dashboardthemes")
 library("shinyBS")
-source("C:/Users/dmika/OneDrive/Dokumenty/login_credentials.R")
+
 
 
 #Zmienne Globalne==============================================================================================================================
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
-                 user = username_db, pass = password_db)
+                 user = "postgres", pass = "IryaStist")
 
 
 
@@ -38,15 +38,16 @@ plans_modal <- plans_modal[, -1]
 plans <- plans_modal[, "Nazwa planu"]
 
 
-top_f <- as.data.table(dbGetQuery(con, "SELECT * FROM top_filmow;"))
+
 top_s <- as.data.table(dbGetQuery(con, "SELECT * FROM top_seriali;"))
+
 
 #============================================================
 credentials <- reactive({
   data.table(
-  username_id = users,
-  passod   = passwords, 
-  stringsAsFactors = F)
+    username_id = users,
+    passod   = passwords, 
+    stringsAsFactors = F)
   
   
 })
@@ -102,11 +103,11 @@ loginpage <- tags$div(id = "loginpage", style = "width: 500px; max-width: 100%; 
                             style = "text-align: center;",
                             actionButton("reg_butt", "Zarejestruj się", style = "color: white; font-weight: 600;")
                             
-                            )
                           )
+                        )
                         #=============
                         
-                        )
+                      )
 )
 
 #=============================================================================================================================================
