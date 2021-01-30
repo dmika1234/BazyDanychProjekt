@@ -12,7 +12,7 @@ library("shinyBS")
 
 
 
-header <- dashboardHeader( title = "Simple Dashboard", uiOutput("logoutbtn"))
+header <- dashboardHeader( title = "asd", uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 

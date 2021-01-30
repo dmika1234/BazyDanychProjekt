@@ -89,22 +89,25 @@ loginpage <- tags$div(id = "loginpage", style = "width: 500px; max-width: 100%; 
                         
                         #RejestracjaUI==================================
                         wellPanel(
-                          tags$h2(HTML('Nie masz konta? <br/> Zarejestruj się'), class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                          tags$h2(HTML('Nie masz konta? <br/> Zarejestruj się'), class = "text-center",
+                                  style = "padding-top: 0; font-weight:600;"),
                           textInput("reg_email", placeholder="E-mail", label = tagList(icon("user"), "E-mail")),
-                          passwordInput("reg_passwd", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Hasło")),
-                          passwordInput("reg_passwd2", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Powtorz haslo")),
+                          passwordInput("reg_passwd", placeholder="Hasło", label = tagList(icon("unlock-alt"), "Hasło")),
+                          passwordInput("reg_passwd2", placeholder="Hasło", label = tagList(icon("unlock-alt"), "Powtórz hasło")),
                           selectInput("reg_plan", "Wybierz plan z listy", choices = plans),
-                          actionButton("about_plan", "Dowiedz sie wiecej o planach"),
+                          actionButton("about_plan", "Dowiedz sie wiecej o planach",
+                                       style='color: black; background-color: white; border-color: white; opacity: .4; padding:4px; font-size:80%'),
                           bsModal("modalExample", "Plany", "about_plan", size = "large",
                                   dataTableOutput("tbl")),
                           br(),
                           div(
                             style = "text-align: center;",
-                            actionButton("reg_butt", "Zarejestruj sie", style = "color: white; font-weight: 600;")
+                            actionButton("reg_butt", "Zarejestruj się", style = "color: white; font-weight: 600;")
                             
                             )
-                         )
+                          )
                         #=============
+                        
                         )
 )
 

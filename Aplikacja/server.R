@@ -66,7 +66,7 @@ function(input, output, session) {
   observeEvent(input$reg_butt, {
     
     if(input$reg_passwd2 != input$reg_passwd){
-      showNotification(paste0("Hasla nie pasuja!"), type = 'err')
+      showNotification(paste0("Podane hasła nie pasują do siebie!"), type = 'err')
       
     }
     else{
@@ -75,7 +75,7 @@ function(input, output, session) {
                                        input$reg_email,"', '", input$reg_passwd, "','", input$reg_plan, "');"))
       },
       error = function(err){
-        showNotification(paste0("Podany email nie istnieje!"), type = 'err')
+        showNotification(paste0("Podany e-mail nie istnieje!"), type = 'err')
       })
       
       showNotification("GITUWA", type = "message") 
@@ -119,7 +119,7 @@ function(input, output, session) {
       
       sidebarMenu(id="tab",
                   menuItem("Konto", tabName="konto", icon = icon("dashboard")),
-                  menuItem("Ogladaj dalej", tabName = "ogladanie", icon =  icon("bar-chart-o")),
+                  menuItem("Oglądaj dalej", tabName = "ogladanie", icon =  icon("bar-chart-o")),
                   menuItem("Twoje komentarze", tabName = "komentarze", icon =  icon("list-alt")),
                   menuItem("Top listy", tabName = "topy", icon = icon("line-chart")),
                   menuItem("Top listy", tabName = "dashboard", icon = icon("sign-out"))
@@ -152,7 +152,7 @@ uzytkownicy_konta <- reactive({
       tabItems(
         tabItem(tabName ="konto", class = "active",
                 fluidRow(
-                  tags$h2("Wybierz uzytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                  tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                   radioGroupButtons(
                     inputId = "Id068",
                     choices = uzytkownicy_konta()$nazwa,
@@ -162,7 +162,7 @@ uzytkownicy_konta <- reactive({
                   )
                   
                 )),
-        tabItem(tabName ="ogladanie",
+        tabItem(tabName ="oglądanie",
                 h2("asdklj")),
         
         tabItem(tabName ="komentarze", 
