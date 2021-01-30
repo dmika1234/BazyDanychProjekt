@@ -144,3 +144,91 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+											   
+---funkcja wypisująca odtworzenia dla konkretnego użytkownika
+
+--filmow
+DROP FUNCTION odtworzenia_f_u;
+
+CREATE OR REPLACE FUNCTION odtworzenia_f_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), moment_zatrzymania TIME) AS $$
+BEGIN
+	RETURN QUERY 
+		SELECT p.tytul, o.moment_zatrzymania
+		FROM odtworzenia o
+			JOIN produkcje p ON p.id_produkcji = o.id_produkcji
+		WHERE o.id_uzytkownika = id_u 
+			AND o.moment_zatrzymania < p.dlugosc_filmu
+			AND p.czy_serial=FALSE
+		ORDER BY o.id_odtworzenia;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+--seriali
+DROP FUNCTION odtworzenia_s_u;
+
+CREATE OR REPLACE FUNCTION odtworzenia_s_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), tytul_odcinka VARCHAR(255), nr_odcinka INTEGER, nr_sezonu INTEGER, moment_zatrzymania TIME) AS $$
+BEGIN
+	RETURN QUERY 
+		SELECT p.tytul, od.tytul_odcinka, od.nr_odcinka, od.nr_sezonu, o.moment_zatrzymania
+		FROM odtworzenia o
+			JOIN produkcje p ON p.id_produkcji = o.id_produkcji
+			JOIN odcinki od ON od.id_odcinka = o. id_odcinka
+		WHERE o.id_uzytkownika = id_u 
+			AND o.moment_zatrzymania < od.dlugosc_odcinka
+			AND p.czy_serial=TRUE
+		ORDER BY o.id_odtworzenia;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+--wszystkie
+DROP FUNCTION odtworzenia_u;
+
+CREATE OR REPLACE FUNCTION odtworzenia_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255)) AS $$
+BEGIN
+	RETURN QUERY 
+	
+	SELECT pod.tytul FROM
+		(SELECT o.id_odtworzenia as id, p.tytul as tytul
+		FROM odtworzenia o
+			JOIN produkcje p ON p.id_produkcji = o.id_produkcji
+			JOIN odcinki od ON od.id_odcinka = o. id_odcinka
+		WHERE o.id_uzytkownika = id_u 
+			AND o.moment_zatrzymania < od.dlugosc_odcinka
+			AND p.czy_serial=TRUE
+		
+		UNION
+		
+		SELECT o.id_odtworzenia as id, p.tytul as tytul
+		FROM odtworzenia o
+			JOIN produkcje p ON p.id_produkcji = o.id_produkcji
+		WHERE o.id_uzytkownika = id_u 
+			AND o.moment_zatrzymania < p.dlugosc_filmu
+			AND p.czy_serial=FALSE) AS pod
+			
+	ORDER BY pod.id;
+
+END;
+$$ LANGUAGE plpgsql;
