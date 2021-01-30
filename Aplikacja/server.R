@@ -14,6 +14,19 @@ library("shinyBS")
 
 function(input, output, session) {
   
+   credentials <- reactive({
+
+     us <- as.data.table(dbGetQuery(con, "SELECT id_konta, haslo, email FROM konta;"))
+     users <- us$email
+     passwords <- us$haslo
+
+     data.table(
+       username_id = users,
+       passod   = passwords,
+      stringsAsFactors = F)
+  })
+
+  
   
 #Panel Logowanie==============================================================================================================================  
   
@@ -27,10 +40,10 @@ function(input, output, session) {
         if (input$login > 0) {
           Username <- isolate(input$userName)
           Password <- isolate(input$passwd)
-          if(length(which(credentials$username_id==Username))==1) { 
+          if(length(which(credentials()$username_id==Username))==1) { 
             #pasmatch  <- credentials["passod"][which(credentials$username_id==Username),]
             #pasverify <- password_verify(pasmatch, Password)
-            pasverify <- credentials[username_id==Username, passod]==Password
+            pasverify <- credentials()[username_id==Username, passod]==Password
             if(pasverify) {
               USER$login <- TRUE
             } else {
@@ -67,12 +80,23 @@ function(input, output, session) {
       
       showNotification("GITUWA", type = "message") 
     }
+    
+    
+    us <- as.data.table(dbGetQuery(con, "SELECT id_konta, haslo, email FROM konta;"))
+    users <- us$email
+    passwords <- us$haslo
+    
+    credentials <- data.table(
+      username_id = users,
+      passod   = passwords, 
+      stringsAsFactors = F)
+    
   })
 
   
 #============================================================================================================================================  
   
-  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE))
+  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
   
   
   
@@ -111,11 +135,15 @@ function(input, output, session) {
 uzytkownicy_konta <- reactive({
   
   id_konta <- us[email == input$userName, id_konta]
-  dbGetQuery(con, paste0("SELECT nazwa FROM uzytkownicy WHERE id_konta = ", id_konta, ";"))$nazwa
+  dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = ", id_konta, ";"))
   
   
 })  
 
+  
+  
+  
+  
     
   
 #Główna treść apki=============================================================================================================================== 
@@ -127,7 +155,7 @@ uzytkownicy_konta <- reactive({
                   tags$h2("Wybierz uzytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                   radioGroupButtons(
                     inputId = "Id068",
-                    choices = uzytkownicy_konta(),
+                    choices = uzytkownicy_konta()$nazwa,
                     size = "lg",
                     width = 100,
                     direction = "horizontal"

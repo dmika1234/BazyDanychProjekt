@@ -12,6 +12,8 @@ library("shinyBS")
 
 
 
+
+
 #Zmienne Globalne==============================================================================================================================
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
@@ -35,18 +37,23 @@ setnames(plans_modal,
          new = c("Nazwa planu", "Maksymalna liczba uzytkownikow", "Cena"))
 
 plans_modal <- plans_modal[, -1]
-plans <- as.data.table9dbGetQuery(con, "SELECT nazwa_planu FROM plany;"))
-
+plans <- plans_modal[, "Nazwa planu"]
 
 
 top_f <- as.data.table(dbGetQuery(con, "SELECT * FROM top_filmow;"))
 top_s <- as.data.table(dbGetQuery(con, "SELECT * FROM top_seriali;"))
 
 #============================================================
-credentials = data.table(
+credentials <- reactive({
+  data.table(
   username_id = users,
   passod   = passwords, 
   stringsAsFactors = F)
+  
+  
+})
+
+
 #=============================================================
 
 
@@ -88,7 +95,7 @@ loginpage <- tags$div(id = "loginpage", style = "width: 500px; max-width: 100%; 
                           passwordInput("reg_passwd2", placeholder="Haslo", label = tagList(icon("unlock-alt"), "Powtorz haslo")),
                           selectInput("reg_plan", "Wybierz plan z listy", choices = plans),
                           actionButton("about_plan", "Dowiedz sie wiecej o planach"),
-                          bsModal("modalExample", "Data Table", "about_plan", size = "large",
+                          bsModal("modalExample", "Plany", "about_plan", size = "large",
                                   dataTableOutput("tbl")),
                           br(),
                           div(
