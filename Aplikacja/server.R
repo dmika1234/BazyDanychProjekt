@@ -122,7 +122,7 @@ function(input, output, session) {
   
   output$logoutbtn <- renderUI({
     req(USER$login)
-    tags$li(a(icon("sign-out"), "Logout", 
+    tags$li(a(icon("sign-out"), "Wyloguj się", 
               href="javascript:window.location.reload(true)"),
             class = "dropdown", 
             style = "background-color: #eee !important; border: 0;
