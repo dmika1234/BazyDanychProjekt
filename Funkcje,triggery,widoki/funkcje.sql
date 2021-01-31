@@ -297,3 +297,90 @@ END;
 $$ LANGUAGE plpgsql; 
 ----
 
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+										   
+-----top najczęściej oglądanych
+
+--filmów
+
+DROP VIEW top_o_filmow;
+CREATE VIEW top_o_filmow AS
+SELECT p.tytul AS "Tytul"
+FROM produkcje p
+	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji
+WHERE p.czy_serial = FALSE
+GROUP BY p.tytul
+ORDER BY count(o.id_odtworzenia) DESC;
+
+
+
+--sortowanie po kategoriach
+
+CREATE OR REPLACE FUNCTION top_o_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255)) AS $$
+BEGIN
+	RETURN QUERY 
+		SELECT p.tytul
+		FROM produkcje p
+			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE
+		GROUP BY p.tytul
+		ORDER BY count(o.id_odtworzenia) DESC;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+--seriali
+
+DROP VIEW top_o_seriali;
+CREATE VIEW top_o_seriali AS
+SELECT p.tytul AS "Tytul"
+FROM produkcje p
+	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji
+WHERE p.czy_serial = TRUE
+GROUP BY p.tytul
+ORDER BY count(o.id_odtworzenia) DESC;
+
+
+CREATE OR REPLACE FUNCTION top_o_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255)) AS $$
+BEGIN
+	RETURN QUERY 
+		SELECT p.tytul
+		FROM produkcje p
+			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE
+		GROUP BY p.tytul
+		ORDER BY count(o.id_odtworzenia) DESC;
+
+END;
+$$ LANGUAGE plpgsql;
