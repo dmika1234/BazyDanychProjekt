@@ -247,8 +247,7 @@ function(input, output, session) {
   })
   
   
-  
-  
+#Dodawaniu uzytkownika  
 observeEvent(input$uz_add,{
   
   if(nrow(uzytkownicy_konta()) >= as.numeric(max_uz())){
@@ -260,10 +259,6 @@ observeEvent(input$uz_add,{
   
 })
 
-
-
-
-#Dodawaniu uzytkownika
 observeEvent(input$uz_add_fin,{
   
   
@@ -290,6 +285,14 @@ observeEvent(input$uz_add_fin,{
 })
 
 
+# uzytkownicy_konta <- eventReactive(input$uz_add_fin, {
+# 
+#   dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
+# 
+# })
+
+
+#=======
   
   
 #Outputy=======================================================================================================================  
