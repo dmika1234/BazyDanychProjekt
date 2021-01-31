@@ -10,7 +10,7 @@ require(data.table)
 library("dashboardthemes")
 library("shinyBS")
 
-
+tags$style("@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);")
 
 header <- dashboardHeader( title = "asd", uiOutput("logoutbtn"))
 

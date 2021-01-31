@@ -9,13 +9,13 @@ require("RPostgres")
 require(data.table)
 library("dashboardthemes")
 library("shinyBS")
-
+source("C:/Users/dmika/OneDrive/Dokumenty/login_credentials.R")
 
 
 #Zmienne Globalne==============================================================================================================================
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
-                 user = "postgres", pass = password_db)
+                 user = username_db, pass = password_db)
 
 
 
