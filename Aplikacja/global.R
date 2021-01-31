@@ -15,7 +15,7 @@ library("shinyBS")
 #Zmienne Globalne==============================================================================================================================
 con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
-                 user = "postgres", pass = "IryaStist")
+                 user = "postgres", pass = password_db)
 
 
 

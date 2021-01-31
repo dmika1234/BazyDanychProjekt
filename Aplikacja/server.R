@@ -33,12 +33,39 @@ function(input, output, session) {
     
   })
   
-  uzytkownicy_konta <- reactive({
+  
+  
+  id_konta <- reactive({
     
     id_konta <- us()[us()$email == input$userName]$id_konta
-    dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta, "';"))
+    
+  })
+  
+  
+  
+  uzytkownicy_konta <- reactive({
+    #a <- input$uz_add_fin
+    dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
     
   })  
+  
+  
+  
+  
+  
+  
+  max_uz <- reactive({
+    
+    
+    as.numeric(dbGetQuery(con, paste0("SELECT p.max_osob FROM plany p
+                           JOIN konta k ON k.id_planu = p.id_planu
+                            WHERE k.id_konta = '", id_konta(), "';")))
+    
+  })
+  
+  
+
+  
   
   v <- reactiveValues()
   
@@ -104,31 +131,7 @@ function(input, output, session) {
   
   
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
-  
-  
-  
-  output$logoutbtn <- renderUI({
-    req(USER$login)
-    tags$li(a(icon("sign-out"), "Wyloguj się", 
-              href="javascript:window.location.reload(true)"),
-            class = "dropdown", 
-            style = "background-color: #eee !important; border: 0;
-                    font-weight: bold; margin:5px; padding: 10px;")
-  })
-  
+
   
   
   #Panel boczny po zalogowaniu===================================================================================================================  
@@ -150,8 +153,7 @@ function(input, output, session) {
 
   #===============================================================================================================================================
   
-  ?radioGroupButtons
-  shinyWidgetsGallery()
+
   
   
   #Główna treść apki=============================================================================================================================== 
@@ -170,7 +172,26 @@ function(input, output, session) {
                     justified = TRUE,
                     width = '100%',
                     individual = TRUE
-                  )
+                  ),
+                  
+                  
+                    actionButton("uz_add", "Dodaj użytkownika"),
+                    bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
+                    wellPanel(
+                      textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
+                      materialSwitch(
+                        inputId = "if_baby_add",
+                        label = "Czy użytkownik to dziecko?", 
+                        status = "primary",
+                        right = TRUE
+                      ),
+                      actionButton("uz_add_fin", "Dodaj")
+                            )
+                          ),
+                    
+                    
+                    
+                  
                   
                 )),
         tabItem(tabName ="ogladanie",
@@ -225,6 +246,81 @@ function(input, output, session) {
     }
   })
   
+  
+  
+  
+observeEvent(input$uz_add,{
+  
+  if(nrow(uzytkownicy_konta()) >= as.numeric(max_uz())){
+    
+    showNotification("Konto posiada maksymalną liczbę użytkowników", type = "err")
+    
+  }
+  
+  
+})
+
+
+
+
+#Dodawaniu uzytkownika
+observeEvent(input$uz_add_fin,{
+  
+  
+  if(input$new_uz_name %in% uzytkownicy_konta()){
+    
+    showNotification("Użytkownik o podannej nazwie istnieje dla tego konta!", type = "err")
+    
+  }
+  else{
+   if(nrow(uzytkownicy_konta()) >= as.numeric(max_uz())){
+    
+    showNotification("Konto posiada maksymalną liczbę użytkowników", type = "err")
+    
+  }
+    else{
+    
+    dbSendQuery(con, paste0("SELECT add_uz(", id_konta(), ", '", input$new_uz_name, "', ", input$if_baby_add, ");"))
+    showNotification("Pomyślnie dodano użytkownika!", type = "message")
+    isolate(uzytkownicy_konta)
+    
+    } 
+  }
+  
+})
+
+
+  
+  
+#Outputy=======================================================================================================================  
+  
+  
+  
+  
+  
+  #plany w panelu logowania
+  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
+  
+  
+  #panel dodawania uzytkownika
+ 
+  
+  
+  #przycisk wylogowania
+  output$logoutbtn <- renderUI({
+    req(USER$login)
+    tags$li(a(icon("sign-out"), "Wyloguj się", 
+              href="javascript:window.location.reload(true)"),
+            class = "dropdown", 
+            style = "background-color: #eee !important; border: 0;
+                    font-weight: bold; margin:5px; padding: 10px;")
+  })
+  
+  
+  
+  
+  
+  
   output$odtworzenia <- DT::renderDataTable({
       
     odtworzenia <- dbGetQuery(con, paste0("SELECT * FROM odtworzenia_u(", input$uzytkownik, ");"))
@@ -247,6 +343,8 @@ function(input, output, session) {
                                           searching = FALSE), escape = FALSE)
     
   })
+  
+  
   
   output$odtworzenia_seriali <- DT::renderDataTable({
     
@@ -276,6 +374,7 @@ function(input, output, session) {
     datatable(top_f, options = list(width = 5,
                                     searching = FALSE))
   })
+  
   
   output$top_seriale  <-  DT::renderDataTable({
     

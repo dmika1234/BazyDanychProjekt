@@ -282,3 +282,18 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+--Dodanie użytkownika--
+DROP FUNCTION add_uz;
+
+CREATE OR REPLACE FUNCTION add_uz(id_k INTEGER, nazwa VARCHAR(255), czy_dziecko1 BOOLEAN) RETURNS VOID AS $$ 
+BEGIN 
+
+	INSERT INTO uzytkownicy (id_konta, nazwa, czy_dziecko) VALUES (id_k, nazwa, czy_dziecko1); 
+
+END; 
+$$ LANGUAGE plpgsql; 
+----
+
