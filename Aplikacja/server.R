@@ -46,18 +46,22 @@ function(input, output, session) {
     #a <- input$uz_add_fin
     dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
 
-    
-  })  
+
+  })
   
-  
-  
-  
-  # uzytkownicy_konta <- eventReactive({input$uz_add_fin | input$login}, {
+  # uz_active <- reactive({
+  #   
+  #   paste(input$uz_add_fin, input$login)
+  #   
+  # })
+  # 
+  # 
+  # uzytkownicy_konta <- eventReactive(uz_active() , {
   #   #a <- input$uz_add_fin
   #   dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
-  #   
-  #   
-  # })  
+  # 
+  # 
+  # })
   
   
   
