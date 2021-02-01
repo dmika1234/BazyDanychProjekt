@@ -400,42 +400,42 @@ function(input, output, session) {
   
   
   
-  output$list_uz <- renderUI(input$uz_add_fin, {
-    
-    box(width = 12, 
-        tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-        radioGroupButtons(
-          inputId = "uzytkownik",
-          choiceNames =  uzytkownicy_konta()$nazwa,
-          choiceValues = uzytkownicy_konta()$id_uzytkownika,
-          size='lg',
-          direction = "horizontal",
-          justified = TRUE,
-          width = '100%',
-          individual = TRUE
-        ),
-        div(
-          style = "text-align: center;",
-          actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
-        bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
-                wellPanel(
-                  textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
-                  materialSwitch(
-                    inputId = "if_baby_add",
-                    label = "Czy użytkownik to dziecko?", 
-                    status = "primary",
-                    right = TRUE
-                  ),
-                  actionButton("uz_add_fin", "Dodaj")
-                )
-        ),
-        
-        
-    )
-    
-    
-    
-  })
+  # output$list_uz <- renderUI(input$uz_add_fin, {
+  #   
+  #   box(width = 12, 
+  #       tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+  #       radioGroupButtons(
+  #         inputId = "uzytkownik",
+  #         choiceNames =  uzytkownicy_konta()$nazwa,
+  #         choiceValues = uzytkownicy_konta()$id_uzytkownika,
+  #         size='lg',
+  #         direction = "horizontal",
+  #         justified = TRUE,
+  #         width = '100%',
+  #         individual = TRUE
+  #       ),
+  #       div(
+  #         style = "text-align: center;",
+  #         actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
+  #       bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
+  #               wellPanel(
+  #                 textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
+  #                 materialSwitch(
+  #                   inputId = "if_baby_add",
+  #                   label = "Czy użytkownik to dziecko?", 
+  #                   status = "primary",
+  #                   right = TRUE
+  #                 ),
+  #                 actionButton("uz_add_fin", "Dodaj")
+  #               )
+  #       ),
+  #       
+  #       
+  #   )
+  #   
+  #   
+  #   
+  # })
   
   
   output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
