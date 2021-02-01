@@ -17,7 +17,7 @@ con <- dbConnect(RPostgres::Postgres(), dbname = "projekt",
                  host = "localhost", port = 5432, 
                  user = username_db, pass = password_db)
 
-
+??db_conn
 
 us <- as.data.table(dbGetQuery(con, "SELECT id_konta, haslo, email FROM konta;"))
 

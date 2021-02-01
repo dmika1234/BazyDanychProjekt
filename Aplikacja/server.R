@@ -48,22 +48,21 @@ function(input, output, session) {
 
 
   })
-  
+
   # uz_active <- reactive({
-  #   
-  #   paste(input$uz_add_fin, input$login)
-  #   
+  # 
+  #   paste(input$refresh_uz, input$login)
+  # 
   # })
   # 
   # 
-  # uzytkownicy_konta <- eventReactive(uz_active() , {
+  # 
+  # uzytkownicy_konta <- eventReactive(uz_active , {
   #   #a <- input$uz_add_fin
   #   dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
   # 
   # 
   # })
-  
-  
   
   
   # 
@@ -227,7 +226,8 @@ function(input, output, session) {
                                 status = "primary",
                                 right = TRUE
                               ),
-                              actionButton("uz_add_fin", "Dodaj")
+                              actionButton("uz_add_fin", "Dodaj"),
+                              actionButton("refresh_uz", "Odśwież użytkowników")
                             )
                     ),
                   
@@ -242,7 +242,10 @@ function(input, output, session) {
                 fluidRow(
                   box(width = 5, 
                       tags$h2("Oglądaj dalej film!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      dataTableOutput('odtworzenia_filmow')),
+                      dataTableOutput('odtworzenia_filmow'),
+                      textOutput("tekstasd"),
+                          ),
+                      uiOutput("watch_ui"),
                   box(width = 7, 
                       tags$h2("Oglądaj dalej serial!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                       dataTableOutput('odtworzenia_seriali')), 
@@ -402,45 +405,7 @@ function(input, output, session) {
   
   
   
-  
-  
-  # output$list_uz <- renderUI(input$uz_add_fin, {
-  #   
-  #   box(width = 12, 
-  #       tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-  #       radioGroupButtons(
-  #         inputId = "uzytkownik",
-  #         choiceNames =  uzytkownicy_konta()$nazwa,
-  #         choiceValues = uzytkownicy_konta()$id_uzytkownika,
-  #         size='lg',
-  #         direction = "horizontal",
-  #         justified = TRUE,
-  #         width = '100%',
-  #         individual = TRUE
-  #       ),
-  #       div(
-  #         style = "text-align: center;",
-  #         actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
-  #       bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
-  #               wellPanel(
-  #                 textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
-  #                 materialSwitch(
-  #                   inputId = "if_baby_add",
-  #                   label = "Czy użytkownik to dziecko?", 
-  #                   status = "primary",
-  #                   right = TRUE
-  #                 ),
-  #                 actionButton("uz_add_fin", "Dodaj")
-  #               )
-  #       ),
-  #       
-  #       
-  #   )
-  #   
-  #   
-  #   
-  # })
-  
+
   
   output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
   
@@ -457,23 +422,63 @@ function(input, output, session) {
   
   
   
+  
+  
+  #DO PRZYCISKÓW#============
+    
+    myValue <- reactiveValues(query = '')
+    
+    shinyInput <- function(FUN, len, id, ...) {
+      inputs <- character(len)
+      for (i in seq_len(len)) {
+        inputs[i] <- as.character(FUN(paste0(id, i), ...))
+      }
+      inputs
+    }
+    
+    
+    
+    
+    table_buttons <- reactive({
+      
+      data = data.frame(
+        
+        Name = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$tytul,
+        Motivation = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$moment_zatrzymania,
+        Actions = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))),
+                             'button_', label = "Fire", onclick = 'Shiny.onInputChange(\"select_button\",  this.id)' ),
+        stringsAsFactors = FALSE)
+      })
+    
+    
+   
+    
+    observeEvent(input$select_button, {
+      selectedRow <- as.numeric(strsplit(input$select_button, "_")[[1]][2])
+      myValue$query <<- paste('click on ',table_buttons()[selectedRow,1], input$select_button)
+    })
+  #===
+  
+    
+    output$tekstasd <- renderText({
+      
+      myValue$query
+      
+      
+    })
+  
+    output$watch_ui <- renderUI({
+      req(input$select_button)
+      textInput("asdasd", "asdasd")
+      modalDialog(textInput("asdasd", "asdasd"), title = "asd")
+    })
+  
+  
   ###### odtworzenia ###################
   
   output$odtworzenia_filmow <- DT::renderDataTable({
-    
-    odtworzenia <- dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))
-    
-    colnames(odtworzenia) <- c("Tytuł", "Moment zatrzymania")
-    
-    odtworzenia[["Oglądaj dalej"]] <-
-      paste0(HTML('
-          <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-secondary delete" input id=play_films_',1:nrow(odtworzenia),'> <i class="fas fa-caret-right"></i> </button>
-          <button type="button" class="btn btn-secondary delete" input id=rate',1:nrow(odtworzenia), '><i class="far fa-thumbs-up"></i></button> 
-          <button type="button" class="btn btn-secondary delete" id=comment',1:nrow(odtworzenia),'><i class="far fa-comment"></i> </button>
-          </div>'))
-    
-    datatable(odtworzenia, options = list(width = 5, searching = FALSE, lengthChange = FALSE), escape = FALSE)
+
+    datatable(table_buttons(), escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
     
   })
   
@@ -484,14 +489,7 @@ function(input, output, session) {
     odtworzenia <- dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))
     
     colnames(odtworzenia) <- c("Tytuł", "Tytuł odcinka", "Nr odcinka", "Nr sezonu", "Moment zatrzymania")
-    
-    odtworzenia[["Oglądaj dalej"]] <-
-      paste0(HTML('
-          <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-secondary delete" id=delete_',1:nrow(odtworzenia),'> <i class="fas fa-caret-right"></i> </button>
-          <button type="button" class="btn btn-secondary delete" id=rate',1:nrow(odtworzenia), '><i class="far fa-thumbs-up"></i></button> 
-          <button type="button" class="btn btn-secondary delete" id=comment',1:nrow(odtworzenia),'><i class="far fa-comment"></i> </button>
-          </div>'))
+  
     
     datatable(odtworzenia, options = list(width = 5, searching = FALSE, lengthChange = FALSE), escape = FALSE)
     
