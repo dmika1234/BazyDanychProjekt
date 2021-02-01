@@ -141,7 +141,8 @@ BEGIN
 		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE
 		GROUP BY p.tytul
 			HAVING COUNT(o.ocena)>10
-		ORDER BY avg(o.ocena) DESC;
+		ORDER BY avg(o.ocena) DESC
+		LIMIT 50;
 		
 
 END;
@@ -167,7 +168,8 @@ BEGIN
 		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE
 		GROUP BY p.tytul
 			HAVING COUNT(o.ocena)>10
-		ORDER BY avg(o.ocena) DESC;
+		ORDER BY avg(o.ocena) DESC
+		LIMIT 50;
 		
 
 END;
@@ -336,7 +338,8 @@ FROM produkcje p
 	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji 
 WHERE p.czy_serial = FALSE 
 GROUP BY p.tytul 
-ORDER BY count(o.id_odtworzenia) DESC; 
+ORDER BY count(o.id_odtworzenia) DESC
+LIMIT 50; 
 
 
 
@@ -351,7 +354,8 @@ BEGIN
 			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji 
 		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE 
 		GROUP BY p.tytul 
-		ORDER BY count(o.id_odtworzenia) DESC; 
+		ORDER BY count(o.id_odtworzenia) DESC
+		LIMIT 50; 
 
 END; 
 $$ LANGUAGE plpgsql; 
@@ -368,7 +372,8 @@ FROM produkcje p
 	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji 
 WHERE p.czy_serial = TRUE 
 GROUP BY p.tytul 
-ORDER BY count(o.id_odtworzenia) DESC; 
+ORDER BY count(o.id_odtworzenia) DESC
+LIMIT 50; 
 
 
 CREATE OR REPLACE FUNCTION top_o_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255)) AS $$ 
@@ -380,7 +385,8 @@ BEGIN
 			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji 
 		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE 
 		GROUP BY p.tytul 
-		ORDER BY count(o.id_odtworzenia) DESC; 
+		ORDER BY count(o.id_odtworzenia) DESC
+		LIMIT 50; 
 
 END; 
 $$ LANGUAGE plpgsql; 
