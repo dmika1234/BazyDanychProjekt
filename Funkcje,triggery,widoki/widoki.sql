@@ -21,7 +21,8 @@ FROM oceny o
 WHERE p.czy_serial = FALSE
 GROUP BY o.id_produkcji, p.tytul
 	HAVING COUNT(o.ocena)>10
-ORDER BY avg(o.ocena) DESC;
+ORDER BY avg(o.ocena) DESC
+LIMIT 50;
 --
 
 
@@ -34,7 +35,8 @@ FROM oceny o
 WHERE p.czy_serial = TRUE
 GROUP BY o.id_produkcji, p.tytul
 	HAVING COUNT(o.ocena)>10
-ORDER BY avg(o.ocena) DESC;
+ORDER BY avg(o.ocena) DESC
+LIMIT 50;
 --
 
 
