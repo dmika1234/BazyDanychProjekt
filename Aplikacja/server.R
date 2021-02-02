@@ -189,7 +189,9 @@ function(input, output, session) {
                               actionButton("refresh_uz", "Odśwież użytkowników")
                             )
                     ),
-                  
+                    box(width = 5, 
+                    tags$h2("Ostatnie płatności", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                    dataTableOutput('platnosci')
                   
                 )
                 
@@ -790,6 +792,17 @@ function(input, output, session) {
 
     
     datatable(top_s, options = list(width = 5, lengthChange = FALSE, searching = FALSE), escape = FALSE)
+  })
+  
+  ## płatności
+  
+    output$platnosci  <-  DT::renderDataTable({
+    
+    platnosci <- as.data.table(dbGetQuery(con, paste0("SELECT * FROM plat_konta(", id_konta(), ");")))
+    
+    colnames(platnosci) <- c("Data", "Kwota")
+    
+    datatable(platnosci, options = list(width = 5, lengthChange = FALSE, searching = FALSE))
   })
   
   #######################################
