@@ -12,7 +12,7 @@ library("shinyBS")
 
 
 
-function(input, output, session) {
+function(input, output, session){
   
   credentials <- reactive({
     
@@ -193,7 +193,7 @@ function(input, output, session) {
                     tags$h2("Ostatnie płatności", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                     dataTableOutput('platnosci')
                   
-                )
+                ))
                 
                 ),
         #=======================
@@ -495,6 +495,7 @@ function(input, output, session) {
   ##Seriale=======================
   #----
   myValue2 <- reactiveValues(id = '',
+                             id_p = '',
                             title = '',
                             moment = '')
   
@@ -526,7 +527,7 @@ function(input, output, session) {
     myValue2$id <- table_buttons_serial()[selectedRow, 7]
     myValue2$id_p <- table_buttons_serial()[selectedRow, 8]
     myValue2$title <- table_buttons_serial()[selectedRow, 1]
-    myValue2$moment <- table_buttons_serial()[selectedRow, 5]
+    myValue2$moment <- as.character(table_buttons_serial()[selectedRow, 5])
   })
   
   
@@ -780,7 +781,6 @@ function(input, output, session) {
       
     }
     
-    colnames(top_s) <- c("Tytuł")
 
     top_s[[HTML("Oglądaj/Oceń/ <br/> Skomentuj")]] <-
       paste0(HTML('

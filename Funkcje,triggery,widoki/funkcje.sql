@@ -239,26 +239,26 @@ $$ LANGUAGE plpgsql;
 
 
 --seriali
-DROP FUNCTION odtworzenia_s_u;
+DROP FUNCTION odtworzenia_s_u; 
 
-CREATE OR REPLACE FUNCTION odtworzenia_s_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), tytul_odcinka VARCHAR(255), nr_odcinka INTEGER, nr_sezonu INTEGER, moment_zatrzymania TIME, id_o INTEGER, id_p INTEGER) AS $$
-BEGIN
-	RETURN QUERY 
-	SELECT p.tytul, od.tytul_odcinka, od.nr_odcinka, od.nr_sezonu, o.moment_zatrzymania, o.id_odcinka, o.id_produkcji 	
-	FROM (SELECT o.id_odcinka, max(o.id_odtworzenia)
-			FROM odtworzenia o
-				JOIN produkcje p ON p.id_produkcji = o.id_produkcji
-			WHERE o.id_uzytkownika = id_u
-				AND p.czy_serial = TRUE
-			GROUP BY o.id_odcinka) AS pod
-		JOIN odtworzenia o ON o.id_odtworzenia = pod.max
-		JOIN produkcje p ON p.id_produkcji = o.id_produkcji
-		JOIN odcinki od ON od.id_odcinka = o. id_odcinka 	
-		WHERE o.moment_zatrzymania < od.dlugosc_odcinka
-		ORDER BY p.id_produkcji;
+CREATE OR REPLACE FUNCTION odtworzenia_s_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), tytul_odcinka VARCHAR(255), nr_odcinka INTEGER, nr_sezonu INTEGER, moment_zatrzymania TIME, id_o INTEGER, id_p INTEGER) AS $$ 
+BEGIN 
+	RETURN QUERY  
+	SELECT p.tytul, od.tytul_odcinka, od.nr_odcinka, od.nr_sezonu, o.moment_zatrzymania, o.id_odcinka, o.id_produkcji  	
+	FROM (SELECT o.id_odcinka, max(o.id_odtworzenia)  
+			FROM odtworzenia o 
+				JOIN produkcje p ON p.id_produkcji = o.id_produkcji 
+			WHERE o.id_uzytkownika = id_u 
+				AND p.czy_serial = TRUE 
+			GROUP BY o.id_odcinka) AS pod 
+		JOIN odtworzenia o ON o.id_odtworzenia = pod.max 
+		JOIN produkcje p ON p.id_produkcji = o.id_produkcji 
+		JOIN odcinki od ON od.id_odcinka = o. id_odcinka  	
+		WHERE o.moment_zatrzymania < od.dlugosc_odcinka 
+		ORDER BY p.id_produkcji; 
 
-END;
-$$ LANGUAGE plpgsql;
+END; 
+$$ LANGUAGE plpgsql; 
 
 
 
@@ -351,52 +351,53 @@ LIMIT 50;
 
 
 --sortowanie po kategoriach
+DROP FUNCTION top_o_f;
 
-CREATE OR REPLACE FUNCTION top_o_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$ 
-BEGIN 
-	RETURN QUERY  
-		SELECT p.tytul, p.id_produkcji
-		FROM produkcje p 
-			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji 
-			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji 
+CREATE OR REPLACE FUNCTION top_o_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$  
+BEGIN  
+	RETURN QUERY   
+		SELECT p.tytul, p.id_produkcji 
+		FROM produkcje p  
+			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji   
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
 		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE 
-		GROUP BY p.tytul, p.id_produkcji
-		ORDER BY count(o.id_odtworzenia) DESC
-		LIMIT 50; 
+		GROUP BY p.tytul, p.id_produkcji 
+		ORDER BY count(o.id_odtworzenia) DESC 
+		LIMIT 50;   
 
-END; 
-$$ LANGUAGE plpgsql; 
+END;  
+$$ LANGUAGE plpgsql;   
 
 
 
 
 --seriali
 
-DROP VIEW top_o_seriali; 
-CREATE VIEW top_o_seriali AS 
-SELECT p.tytul, p.id_produkcji AS "Tytul" 
-FROM produkcje p 
-	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji 
-WHERE p.czy_serial = TRUE 
-GROUP BY p.tytul, p.id_produkcji
-ORDER BY count(o.id_odtworzenia) DESC
-LIMIT 50; 
+DROP VIEW top_o_seriali;  
+CREATE VIEW top_o_seriali AS  
+SELECT p.tytul, p.id_produkcji AS "Tytul"  
+FROM produkcje p   
+	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji  
+WHERE p.czy_serial = TRUE  
+GROUP BY p.tytul, p.id_produkcji 
+ORDER BY count(o.id_odtworzenia) DESC 
+LIMIT 50;  
 
 
-CREATE OR REPLACE FUNCTION top_o_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$ 
-BEGIN 
-	RETURN QUERY  
-		SELECT p.tytul, p.id_produkcji
-		FROM produkcje p 
-			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji 
-			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji 
-		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE 
-		GROUP BY p.tytul, p.id_produkcji
-		ORDER BY count(o.id_odtworzenia) DESC
-		LIMIT 50; 
+CREATE OR REPLACE FUNCTION top_o_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$  
+BEGIN  
+	RETURN QUERY   
+		SELECT p.tytul, p.id_produkcji 
+		FROM produkcje p  
+			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji  
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE  
+		GROUP BY p.tytul, p.id_produkcji 
+		ORDER BY count(o.id_odtworzenia) DESC 
+		LIMIT 50;    
 
-END; 
-$$ LANGUAGE plpgsql; 
+END;  
+$$ LANGUAGE plpgsql;  
 									       
 									       
 									       
@@ -412,14 +413,14 @@ $$ LANGUAGE plpgsql;
 									       
 									       
 --platnosci dla konkretnego konta
-CREATE OR REPLACE FUNCTION plat_konta(id_k INTEGER) RETURNS TABLE(data_p DATE, kw DECIMAL(5, 2)) AS $$
-BEGIN
-	RETURN QUERY 
-		SELECT p.data, p.kwota
-		FROM platnosci p
-		WHERE p.id_konta = id_k
-		ORDER BY p.data DESC;
+CREATE OR REPLACE FUNCTION plat_konta(id_k INTEGER) RETURNS TABLE(data_p DATE, kw DECIMAL(5, 2)) AS $$ 
+BEGIN 
+	RETURN QUERY  
+		SELECT p.data, p.kwota 
+		FROM platnosci p 
+		WHERE p.id_konta = id_k 
+		ORDER BY p.data DESC; 
 
-END;
-$$ LANGUAGE plpgsql;
+END; 
+$$ LANGUAGE plpgsql;  
 
