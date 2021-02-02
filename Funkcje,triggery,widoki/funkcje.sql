@@ -36,13 +36,14 @@ $$ LANGUAGE plpgsql;
 
 
 --funkcja odtwarzania
+DROP FUNCTION odtworz_film;
 
-CREATE OR REPLACE FUNCTION odtworz_film(id_u INTEGER, id_p INTEGER , mom TIME) RETURNS VOID AS $$
-BEGIN
-	INSERT INTO odtworzenia(id_uzytkownika, id_produkcji, moment_zatrzymania) VALUES(id_u, id_p, mom);
+CREATE OR REPLACE FUNCTION odtworz_film(id_u INTEGER, id_p INTEGER , mom TIME) RETURNS VOID AS $$	
+BEGIN 
+	INSERT INTO odtworzenia(id_uzytkownika, id_produkcji, moment_zatrzymania) VALUES(id_u, id_p, mom); 
 
-END;
-$$ LANGUAGE plpgsql;
+END; 
+$$ LANGUAGE plpgsql; 
 
 
 
@@ -217,41 +218,41 @@ $$ LANGUAGE plpgsql;
 ---funkcja wypisująca odtworzenia dla konkretnego użytkownika
 
 --filmow
-DROP FUNCTION odtworzenia_f_u;
+DROP FUNCTION odtworzenia_f_u; 
 
-CREATE OR REPLACE FUNCTION odtworzenia_f_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), moment_zatrzymania TIME) AS $$
-BEGIN
-	RETURN QUERY 
-		SELECT p.tytul, o.moment_zatrzymania
-		FROM odtworzenia o
-			JOIN produkcje p ON p.id_produkcji = o.id_produkcji
-		WHERE o.id_uzytkownika = id_u 
-			AND o.moment_zatrzymania < p.dlugosc_filmu
-			AND p.czy_serial=FALSE
-		ORDER BY o.id_odtworzenia;
-
-END;
-$$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION odtworzenia_f_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), moment_zatrzymania TIME, id_p INTEGER) AS $$ 
+BEGIN 
+	RETURN QUERY  
+		SELECT p.tytul, o.moment_zatrzymania, o.id_produkcji 
+		FROM odtworzenia o 
+			JOIN produkcje p ON p.id_produkcji = o.id_produkcji 
+		WHERE o.id_uzytkownika = id_u  
+			AND o.moment_zatrzymania < p.dlugosc_filmu 
+			AND p.czy_serial=FALSE 
+		ORDER BY o.id_odtworzenia; 
+ 
+END; 
+$$ LANGUAGE plpgsql; 
 
 
 
 --seriali
-DROP FUNCTION odtworzenia_s_u;
+DROP FUNCTION odtworzenia_s_u;	
 
-CREATE OR REPLACE FUNCTION odtworzenia_s_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), tytul_odcinka VARCHAR(255), nr_odcinka INTEGER, nr_sezonu INTEGER, moment_zatrzymania TIME) AS $$
-BEGIN
-	RETURN QUERY 
-		SELECT p.tytul, od.tytul_odcinka, od.nr_odcinka, od.nr_sezonu, o.moment_zatrzymania
-		FROM odtworzenia o
-			JOIN produkcje p ON p.id_produkcji = o.id_produkcji
-			JOIN odcinki od ON od.id_odcinka = o. id_odcinka
-		WHERE o.id_uzytkownika = id_u 
-			AND o.moment_zatrzymania < od.dlugosc_odcinka
-			AND p.czy_serial=TRUE
-		ORDER BY o.id_odtworzenia;
+CREATE OR REPLACE FUNCTION odtworzenia_s_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), tytul_odcinka VARCHAR(255), nr_odcinka INTEGER, nr_sezonu INTEGER, moment_zatrzymania TIME, id_o INTEGER, id_p INTEGER)  AS $$  
+BEGIN 	
+	RETURN QUERY  	
+		SELECT p.tytul, od.tytul_odcinka, od.nr_odcinka, od.nr_sezonu, o.moment_zatrzymania, o.id_odcinka, o.id_produkcji 	
+		FROM odtworzenia o 	
+			JOIN produkcje p ON p.id_produkcji = o.id_produkcji 	
+			JOIN odcinki od ON od.id_odcinka = o. id_odcinka 	
+		WHERE o.id_uzytkownika = id_u  	
+			AND o.moment_zatrzymania < od.dlugosc_odcinka		 
+			AND p.czy_serial=TRUE 	
+		ORDER BY o.id_odtworzenia; 	
 
-END;
-$$ LANGUAGE plpgsql;
+END; 	
+$$ LANGUAGE plpgsql; 	
 
 
 
