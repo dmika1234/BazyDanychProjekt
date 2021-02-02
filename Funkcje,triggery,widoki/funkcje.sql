@@ -392,3 +392,29 @@ BEGIN
 
 END; 
 $$ LANGUAGE plpgsql; 
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+									       
+--platnosci dla konkretnego konta
+CREATE OR REPLACE FUNCTION plat_konta(id_k INTEGER) RETURNS TABLE(data_p DATE, kw DECIMAL(5, 2)) AS $$
+BEGIN
+	RETURN QUERY 
+		SELECT p.data, p.kwota
+		FROM platnosci p
+		WHERE p.id_konta = id_k
+		ORDER BY p.data DESC;
+
+END;
+$$ LANGUAGE plpgsql;
+
