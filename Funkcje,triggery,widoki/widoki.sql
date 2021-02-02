@@ -15,7 +15,7 @@ LIMIT 10;
 --Top filmow--
 DROP VIEW top_filmow;
 CREATE VIEW top_filmow AS
-SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen"
+SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen", o.id_produkcji AS id_p
 FROM oceny o
 	JOIN produkcje p ON o.id_produkcji = p.id_produkcji
 WHERE p.czy_serial = FALSE
