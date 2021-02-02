@@ -218,24 +218,24 @@ $$ LANGUAGE plpgsql;
 ---funkcja wypisująca odtworzenia dla konkretnego użytkownika
 
 --filmow
-DROP FUNCTION odtworzenia_f_u;
+DROP FUNCTION odtworzenia_f_u;	
 
-CREATE OR REPLACE FUNCTION odtworzenia_f_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), moment_zatrzymania TIME) AS $$
-BEGIN
-	RETURN QUERY 
-	SELECT p.tytul, o.moment_zatrzymania
-	FROM (SELECT p.tytul, max(o.id_odtworzenia)
-			FROM odtworzenia o
-				JOIN produkcje p ON p.id_produkcji = o.id_produkcji
-			WHERE o.id_uzytkownika = id_u
-				AND p.czy_serial=FALSE
-			GROUP BY o.id_produkcji, p.tytul) AS pod
-		JOIN odtworzenia o ON o.id_odtworzenia = pod.max
-		JOIN produkcje p ON p.id_produkcji = o.id_produkcji
-		WHERE o.moment_zatrzymania < p.dlugosc_filmu;
+CREATE OR REPLACE FUNCTION odtworzenia_f_u(id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), moment_zatrzymania TIME, id_p INTEGER) AS $$ 		
+BEGIN 		
+	RETURN QUERY  	
+	SELECT p.tytul, o.moment_zatrzymania, p.id_produkcji 	
+	FROM (SELECT p.tytul, max(o.id_odtworzenia) 	
+			FROM odtworzenia o 	
+				JOIN produkcje p ON p.id_produkcji = o.id_produkcji 	
+			WHERE o.id_uzytkownika = id_u 	
+				AND p.czy_serial=FALSE 	
+			GROUP BY o.id_produkcji, p.tytul) AS pod 	
+		JOIN odtworzenia o ON o.id_odtworzenia = pod.max 	
+		JOIN produkcje p ON p.id_produkcji = o.id_produkcji 	
+		WHERE o.moment_zatrzymania < p.dlugosc_filmu; 	
 
-END;
-$$ LANGUAGE plpgsql;
+END; 	
+$$ LANGUAGE plpgsql; 	
 
 
 --seriali
