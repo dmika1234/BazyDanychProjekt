@@ -131,23 +131,22 @@ SELECT * FROM top(2);
 												 
 												 
 												 
-												 
-CREATE OR REPLACE FUNCTION top_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), srednia DECIMAL(5, 2)) AS $$
-BEGIN
-	RETURN QUERY 
-		SELECT p.tytul, round(avg(o.ocena), 2)
-		FROM produkcje p
-			JOIN oceny o ON p.id_produkcji = o.id_produkcji
-			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji
-		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE
-		GROUP BY p.tytul
-			HAVING COUNT(o.ocena)>10
-		ORDER BY avg(o.ocena) DESC
-		LIMIT 50;
+DROP FUNCTION top_f;												 
+CREATE OR REPLACE FUNCTION top_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), srednia DECIMAL(5, 2), id_p INTEGER) AS $$  
+BEGIN  
+	RETURN QUERY   
+		SELECT p.tytul, round(avg(o.ocena), 2), p.id_produkcji  
+		FROM produkcje p  
+			JOIN oceny o ON p.id_produkcji = o.id_produkcji  
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE  
+		GROUP BY p.tytul, p.id_produkcji  
+			HAVING COUNT(o.ocena)>10  
+		ORDER BY avg(o.ocena) DESC  
+		LIMIT 50;  
 		
-
-END;
-$$ LANGUAGE plpgsql;
+END;  
+$$ LANGUAGE plpgsql; 
 
 SELECT * FROM top(2);
 			

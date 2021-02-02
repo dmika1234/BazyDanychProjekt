@@ -49,42 +49,6 @@ function(input, output, session) {
 
   })
 
-  # uz_active <- reactive({
-  # 
-  #   paste(input$refresh_uz, input$login)
-  # 
-  # })
-  # 
-  # 
-  # 
-  # uzytkownicy_konta <- eventReactive(uz_active , {
-  #   #a <- input$uz_add_fin
-  #   dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
-  # 
-  # 
-  # })
-  
-  
-  # 
-  # ikonki_konta <- reactive({
-  #   
-  #   x <- 1:nrow(uzytkownicy_konta())
-  #   
-  #   for(i in 1:nrow(uzytkownicy_konta())) {
-  #     
-  #     if(uzytkownicy_konta$czy_dziecko[i] == FALSE)
-  #       {
-  #       x[i] <- "fas fa-user-ninja"
-  #     }
-  #     else
-  #       {
-  #       x[i] <- "fas fa-child"
-  #     }
-  #   }
-  #     x
-  #   
-  #   
-  # })
   
   
   max_uz <- reactive({
@@ -97,10 +61,10 @@ function(input, output, session) {
   })
   
   
-  v <- reactiveValues()
+ 
   
   #Panel Logowanie==============================================================================================================================  
-  
+  #----
   login = FALSE
   USER <- reactiveValues(login = login)
   
@@ -133,7 +97,9 @@ function(input, output, session) {
   #================================================================================================================================================  
   
   
+  
   #Panel rejestracja==================================================================================================================================  
+  #----
   observeEvent(input$reg_butt, {
     
     if(input$reg_passwd2 != input$reg_passwd){
@@ -161,22 +127,13 @@ function(input, output, session) {
   
   
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
   
 
   
   
   #Panel boczny po zalogowaniu===================================================================================================================  
+  #----
   output$sidebarpanel <- renderUI({
     if (USER$login == TRUE ){ 
       
@@ -198,10 +155,12 @@ function(input, output, session) {
 
   
   #Główna treść apki=============================================================================================================================== 
+  #----
   output$body <- renderUI({
     if (USER$login == TRUE ) {
       tabItems(
         tabItem(tabName ="konto", class = "active",
+                #----
                 box(width = 12, 
                   tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                   radioGroupButtons(
@@ -235,10 +194,10 @@ function(input, output, session) {
                 )
                 
                 ),
-        
+        #=======================
        
         tabItem(tabName ="ogladanie",
-                
+                #---- 
                 fluidRow(
                   box(width = 5, 
                       tags$h2("Oglądaj dalej film!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
@@ -251,35 +210,15 @@ function(input, output, session) {
                   
                 )
               ),
+        #===============
         
         tabItem(tabName ="komentarze", 
-                HTML(
-                  '<div id="respond">
-                    
-                    <h3>Leave a Comment</h3>
-                    
-                    <form action="post_comment.php" method="post" id="commentform">
-                    
-                    <label for="comment_author" class="required">Your name</label>
-                    <input type="text" name="comment_author" id="comment_author" value="" tabindex="1" required="required">
-                    
-                    <label for="email" class="required">Your email;</label>
-                    <input type="email" name="email" id="email" value="" tabindex="2" required="required">
-                    
-                    <label for="comment" class="required">Your message</label>
-                    <textarea name="comment" id="comment" rows="10" tabindex="4"  required="required"></textarea>
-                    
-                    <-- comment_post_ID value hard-coded as 1 -->
-                    <input type="hidden" name="comment_post_ID" value="1" id="comment_post_ID" />
-                    <input name="submit" type="submit" value="Submit comment" />
-                    
-                    </form>
-                    
-                    </div>'
-                )
+                #----
                 ),
+       #================
        
         tabItem(tabName ="topy",
+                #----
                 tags$h1("Jakie produkcje użytkownicy oceniają najlepiej?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                 fluidRow( 
                   box(width = 6,
@@ -295,6 +234,9 @@ function(input, output, session) {
                         choiceValues = c(0, 12, 2, 22, 18, 9, 19, 11, 10, 4, 20, 3, 14)
                       ),
                       dataTableOutput('top_filmy')),
+                  uiOutput("watch_ui3"),
+                  
+                  
                   box(width = 6, 
                       tags$h2("Najlepsze seriale!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                       radioGroupButtons(
@@ -343,19 +285,21 @@ function(input, output, session) {
                   
                 )
         )
+      #=========
       )
-      #=========================================================================================================================================    
+          
     }
     else {
       loginpage
     }
   })
-  
+  #=========================================================================================================================================
   
 
   
   
   #Dodawaniu uzytkownika  
+  #----
   observeEvent(input$uz_add,{
     
     if(nrow(uzytkownicy_konta()) >= as.numeric(max_uz())){
@@ -406,9 +350,7 @@ function(input, output, session) {
 
   
   output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
-  
-  
-  
+
   output$logoutbtn <- renderUI({
     req(USER$login)
     tags$li(a(icon("sign-out"), "Wyloguj się", 
@@ -441,20 +383,23 @@ function(input, output, session) {
   
     
     ##Filmy
-    
-    myValue <- reactiveValues(query = '',
-                              id = '',
+    #----
+    myValue <- reactiveValues(id = '',
                               title = '',
                               moment = '')
     
     
     table_buttons_film <- reactive({
-      
+      input$addtowatch
+      input$stop_moment_button
       data = data.frame(
         Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$tytul,
         Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$moment_zatrzymania,
         Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))),
-                             'button_', label = "Fire", onclick = 'Shiny.onInputChange(\"select_buttonfilm\",  this.id)' ),
+                             'button_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
+                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
+                                                     <i class="far fa-comment"></i>') , 
+                           onclick = 'Shiny.onInputChange(\"select_buttonfilm\",  this.id)' ),
         id_produkcji = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$id_p,
         stringsAsFactors = FALSE)
       })
@@ -467,7 +412,6 @@ function(input, output, session) {
       myValue$id <- table_buttons_film()[selectedRow, 4]
       myValue$title <- table_buttons_film()[selectedRow, 1]
       myValue$moment <- table_buttons_film()[selectedRow, 2]
-      myValue$query <<- paste('click on ',table_buttons_film()[selectedRow, 1],  input$select_buttonfilm)
     })
   
   
@@ -478,8 +422,6 @@ function(input, output, session) {
       req(input$select_buttonfilm)
         modalDialog(
           
-        #dbGetQuery(con, paste0("SELECT dlugosc_filmu FROM produkcje WHERE tytul='", myValue$title, "';"))
-          #myValue$moment
           sliderInput("stop_moment_film", "Oglądaj dalej!",   
                       min = as.POSIXct("2017-01-01 00:00:00"),   
                       max = as.POSIXct(paste("2017-01-01",
@@ -543,34 +485,46 @@ function(input, output, session) {
   
   
   
+  
+  
+  
+  
+  
   ##Seriale=======================
-  myValue2 <- reactiveValues(query = '',
-                            id = '',
+  #----
+  myValue2 <- reactiveValues(id = '',
                             title = '',
                             moment = '')
   
   
   table_buttons_serial <- reactive({
-    
-    data = data.frame(
+    input$stop_moment_button2
+    data = data.table(
       Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul,
+      Tytuł_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul_odcinka,
+      Nr_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$nr_odcinka,
+      Nr_sezonu = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$nr_sezonu,
       Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$moment_zatrzymania,
       Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))),
-                         'sbutton_', label = "Fire", onclick = 'Shiny.onInputChange(\"select_buttonserial\",  this.id)' ),
+                         'sbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
+                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
+                                                     <i class="far fa-comment"></i>'), onclick = 'Shiny.onInputChange(\"select_buttonserial\",  this.id)' ),
       id_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$id_o,
       id_prod = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$id_p,
       stringsAsFactors = FALSE)
+    
+     
+    
   })
   
   
   
   observeEvent(input$select_buttonserial, {
     selectedRow <- as.numeric(strsplit(input$select_buttonserial, "_")[[1]][2])
-    myValue2$id <- table_buttons_serial()[selectedRow, 4]
-    myValue2$id_p <- table_buttons_serial()[selectedRow, 5]
+    myValue2$id <- table_buttons_serial()[selectedRow, 7]
+    myValue2$id_p <- table_buttons_serial()[selectedRow, 8]
     myValue2$title <- table_buttons_serial()[selectedRow, 1]
-    myValue2$moment <- table_buttons_serial()[selectedRow, 2]
-    myValue2$query <<- paste('click on ',table_buttons_serial()[selectedRow, 1],  input$select_buttonserial)
+    myValue2$moment <- table_buttons_serial()[selectedRow, 5]
   })
   
   
@@ -579,9 +533,7 @@ function(input, output, session) {
   output$watch_ui2 <- renderUI({
     req(input$select_buttonserial)
     modalDialog(
-      
-      #dbGetQuery(con, paste0("SELECT dlugosc_filmu FROM produkcje WHERE tytul='", myValue$title, "';"))
-      #myValue$moment
+
       sliderInput("stop_moment_serial", "Oglądaj dalej!",   
                   min = as.POSIXct("2017-01-01 00:00:00"),   
                   max = as.POSIXct(paste("2017-01-01",
@@ -637,12 +589,15 @@ function(input, output, session) {
     
   })
   
-  
+
   
   output$odtworzenia_seriali <- DT::renderDataTable({
     
-    datatable(table_buttons_serial()[,c(-4,-5)], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
+    #colnames(table_buttons_serial()) <- c("Tytuł", "Tytuł odcinka", "Nr odcinka", "Nr sezonu", "Zatrzymanie", "Akcje",
+                                          #"id_odcinka", "id_prod")
     
+    datatable(table_buttons_serial()[,1:6], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
+
   })
   
   ######################################################
@@ -656,29 +611,110 @@ function(input, output, session) {
   
   ###### topy #######################
   
-  ## top najlepiej oceniane filmy
+    ## top najlepiej oceniane filmy
+    #----
+  myValue3 <- reactiveValues(id = '',
+                             title = '',
+                             butt = '')
+  
+  
+  table_buttons_topf <- reactive({
+
+    
+    if(input$kat_f == 0){
+      data = data.table(
+        Tytuł = dbGetQuery(con, "SELECT * FROM top_filmow;")$Tytul,
+        Średnia = dbGetQuery(con, "SELECT * FROM top_filmow;")$'Srednia ocen',
+        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, "SELECT * FROM top_filmow;")),
+                           'topfbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
+                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
+                                                     <i class="far fa-comment"></i>'),
+                           onclick = 'Shiny.onInputChange(\"select_buttontopf\",  this.id)' ),
+        id_p = dbGetQuery(con, "SELECT * FROM top_filmow;")$id_p,
+        stringsAsFactors = FALSE)
+    }
+    else{
+      data = data.table(
+        Tytuł = dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))$tytul,
+        Średnia = dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))$srednia,
+        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, "SELECT * FROM top_filmow;")),
+                           'topfbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
+                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
+                                                     <i class="far fa-comment"></i>'), onclick = 'Shiny.onInputChange(\"select_buttontopf\",  this.id)' ),
+        id_p = dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))$id_p,
+        stringsAsFactors = FALSE)
+    }
+  })
+  
+  observeEvent(input$select_buttontopf, {
+    selectedRow <- as.numeric(strsplit(input$select_buttontopf, "_")[[1]][2])
+    myValue3$id <- as.numeric(table_buttons_topf()[selectedRow, 4])
+ 
+      
+  })
+  
+
   
   output$top_filmy  <-  DT::renderDataTable({
     
-    if(input$kat_f == 0){
-      top_f <- as.data.table(dbGetQuery(con, "SELECT * FROM top_filmow;"))
-    }
-    else{
-      top_f <- as.data.table(dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");")))
-    }
-    
-    colnames(top_f) <- c("Tytuł", "Średnia")
-    
-    top_f[[HTML("Oglądaj/Oceń/ <br/> Skomentuj")]] <-
-      paste0(HTML('
-          <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-secondary delete" id=delete_',1:nrow(top_f),'> <i class="fas fa-caret-right"></i> </button>
-          <button type="button" class="btn btn-secondary delete" id=rate',1:nrow(top_f), '><i class="far fa-thumbs-up"></i></button> 
-          <button type="button" class="btn btn-secondary delete" id=comment',1:nrow(top_f),'><i class="far fa-comment"></i> </button>
-          </div>'))
-    
-    datatable(top_f, options = list(width = 5, lengthChange = FALSE, searching = FALSE), escape = FALSE)
+
+      datatable(table_buttons_topf()[, -4], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
   })
+  
+  
+  
+  
+  output$watch_ui3 <- renderUI({
+    req(input$select_buttontopf)
+    modalDialog(
+      actionButton("addtowatch", "Dodaj film do oglądania"),
+      radioGroupButtons(
+        inputId = "ocena_top",
+        label = "Oceń film",
+        choices = 1:10
+      ),
+      actionButton("add_ocena_top", "Zatwierdź ocenę"),
+      textInput("top_kom", "Skomentuj produkcję"),
+      actionButton("add_top_kom", "Dodaj komentarz")
+      
+    )
+  })
+  
+  
+  observeEvent(input$addtowatch, {
+    
+    dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue3$id, ", ", "'00:00:00');"))
+    showNotification("Dodano film do oglądania!", type = "message")
+    
+  })
+  
+  observeEvent(input$add_ocena_top, {
+    tryCatch({
+      res <- dbSendQuery(con, paste0("INSERT INTO oceny VALUES (", myValue3$id, ", ", input$uzytkownik, ", ", input$ocena_top, ");"))
+    },
+    error = function(err){
+      showNotification(paste0("Oceniono już tą produkcję!"), type = 'warning')
+    })
+    
+    if(!(myValue3$id %in% dbGetQuery(con, paste0("SELECT id_produkcji FROM oceny WHERE id_uzytkownika=", input$uzytkownik, ";"))$id_produkcji)){
+      
+      showNotification("Dziękujemy za ocenę!", type = "message")
+    }
+    
+    
+  })
+  
+
+  observeEvent(input$add_top_kom, {
+    
+    dbSendQuery(con, paste0("SELECT skomentuj_film(NULL, '", input$top_kom, "', ", input$uzytkownik, ", ", myValue3$id, ");"))
+    showNotification("Dodano komentarz!", type = "message")
+    
+  })
+  #===========
+  
+  
+  
   
   ## top najlepiej oceniane seriale 
   
