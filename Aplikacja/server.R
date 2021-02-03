@@ -213,15 +213,21 @@ function(input, output, session){
                 fluidRow(
                   box(width = 5, 
                       tags$h2("Oglądaj dalej film!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      dataTableOutput('odtworzenia_filmow')),
+                      dataTableOutput('odtworzenia_filmow'),
+                      textOutput("test"),
+                      dropdownButton(textInput("prod_find", "Wyszukaj film", placeholder = "Tytuł"),
+                                     actionButton("confirm_find", "Szukaj"),
+                                     icon = icon("search"))
+                      ),
                       uiOutput("watch_ui"),
                   box(width = 7, 
                       tags$h2("Oglądaj dalej serial!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      dataTableOutput('odtworzenia_seriali')),
+                      dataTableOutput('odtworzenia_seriali'),
+                      textOutput("test1"),
+                      dropdownButton(textInput("prod_find", "Wyszukaj serial", placeholder = "Tytuł"),
+                                     actionButton("confirm_find", "Szukaj"),
+                                     icon = icon("search"))),
                     uiOutput("watch_ui2"),
-                  
-                  searchInput("find_prod", "Wyszukaj produkcję"),
-                  
                 )
               ),
         #===============
@@ -436,7 +442,12 @@ function(input, output, session){
     })
   
   
-    
+    output$test <- renderText({
+      
+      
+      as.character(myValue$moment)
+      
+    })
     
     
     output$watch_ui <- renderUI({
@@ -552,13 +563,19 @@ function(input, output, session){
   
   observeEvent(input$select_buttonserial, {
     selectedRow <- as.numeric(strsplit(input$select_buttonserial, "_")[[1]][2])
-    myValue2$id <- table_buttons_serial()[selectedRow, 7]
-    myValue2$id_p <- table_buttons_serial()[selectedRow, 8]
-    myValue2$title <- table_buttons_serial()[selectedRow, 1]
-    myValue2$moment <- as.character(table_buttons_serial()[selectedRow, 5])
+    myValue2$id <- table_buttons_serial()[selectedRow, id_odcinka]
+    myValue2$id_p <- table_buttons_serial()[selectedRow, id_prod]
+    myValue2$title <- table_buttons_serial()[selectedRow, Tytuł]
+    myValue2$moment <- table_buttons_serial()[selectedRow, Zatrzymanie]
   })
   
   
+  output$test1 <- renderText({
+    
+    
+    as.character(myValue2$moment)
+    
+  })
 
   
   output$watch_ui2 <- renderUI({
