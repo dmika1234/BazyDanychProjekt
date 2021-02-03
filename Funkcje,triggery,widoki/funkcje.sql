@@ -424,4 +424,61 @@ BEGIN
 
 END; 
 $$ LANGUAGE plpgsql;  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+-- funkcja podająco id następnego odcinka
+
+DROP FUNCTION id_kolejnego_odcinka;
+
+CREATE OR REPLACE FUNCTION id_kolejnego_odcinka(id_o INTEGER) RETURNS INTEGER AS $$
+DECLARE
+ten_odcinek RECORD;
+kolejny_odcinek RECORD;
+BEGIN
+	SELECT * INTO ten_odcinek 
+	FROM odcinki 
+	WHERE id_odcinka = id_o;
+	
+	SELECT * INTO kolejny_odcinek 
+	FROM odcinki 
+	WHERE id_produkcji = ten_odcinek.id_produkcji 
+		AND nr_sezonu = ten_odcinek.nr_sezonu
+		AND nr_odcinka = ten_odcinek.nr_odcinka + 1;
+		
+	IF(FOUND) THEN
+		RETURN kolejny_odcinek.id_odcinka;
+	ELSE
+		SELECT * INTO kolejny_odcinek
+		FROM odcinki
+		WHERE id_produkcji = ten_odcinek.id_produkcji 
+			AND nr_sezonu = ten_odcinek.nr_sezonu + 1
+			AND nr_odcinka = 1;
+			
+		IF(FOUND) THEN
+			RETURN kolejny_odcinek.id_odcinka;
+		ELSE 
+			RETURN 0;
+		END IF;
+	END IF;
+	
+	
+
+END;
+$$ LANGUAGE plpgsql;
 
