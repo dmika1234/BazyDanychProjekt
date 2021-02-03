@@ -12,7 +12,12 @@ library("shinyBS")
 
 tags$style("@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);")
 
-header <- dashboardHeader( title = "asd", uiOutput("logoutbtn"))
+# title <- tags$li(class = "dropdown",
+#                  tags$a(href='https://www.google.com',
+#                 icon("diamond"),
+#                 'Diamonds Explorer', target="_blank"))
+
+header <- dashboardHeader( title = "Filmex",  uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 

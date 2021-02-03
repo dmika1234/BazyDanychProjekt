@@ -157,23 +157,23 @@ SELECT * FROM top(2);
 												   
 												   
 												   
-												   
-CREATE OR REPLACE FUNCTION top_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), srednia DECIMAL(5, 2), id_p INTEGER) AS $$
-BEGIN
-	RETURN QUERY 
-		SELECT p.tytul, round(avg(o.ocena), 2), p.id_produkcji
-		FROM produkcje p
-			JOIN oceny o ON p.id_produkcji = o.id_produkcji
-			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji
-		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE
-		GROUP BY p.tytul, p.id_produkcji
-			HAVING COUNT(o.ocena)>10
-		ORDER BY avg(o.ocena) DESC
-		LIMIT 50;
+DROP FUNCTION top_s;												   
+CREATE OR REPLACE FUNCTION top_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), srednia DECIMAL(5, 2), id_p INTEGER) AS $$ 
+BEGIN 
+	RETURN QUERY  
+		SELECT p.tytul, round(avg(o.ocena), 2), p.id_produkcji 
+		FROM produkcje p 
+			JOIN oceny o ON p.id_produkcji = o.id_produkcji 
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji 
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE 
+		GROUP BY p.tytul, p.id_produkcji 
+			HAVING COUNT(o.ocena)>10 
+		ORDER BY avg(o.ocena) DESC 
+		LIMIT 50; 
 		
 
-END;
-$$ LANGUAGE plpgsql;
+END; 
+$$ LANGUAGE plpgsql; 
 												 
 												 
 												 
@@ -338,66 +338,67 @@ $$ LANGUAGE plpgsql;
 
 --filmów
 
-DROP VIEW top_o_filmow;
-CREATE VIEW top_o_filmow AS 
-SELECT p.tytul, p.id_produkcji AS "Tytul" 
-FROM produkcje p 
-	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji 
-WHERE p.czy_serial = FALSE 
-GROUP BY p.tytul, p.id_produkcji
-ORDER BY count(o.id_odtworzenia) DESC
-LIMIT 50; 
+ DROP VIEW top_o_filmow; 
+CREATE VIEW top_o_filmow AS   
+SELECT p.tytul, p.id_produkcji AS id_p 
+FROM produkcje p  
+	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji  
+WHERE p.czy_serial = FALSE  
+GROUP BY p.tytul, p.id_produkcji 
+ORDER BY count(o.id_odtworzenia) DESC 
+LIMIT 50;  
 
 
 
 --sortowanie po kategoriach
 DROP FUNCTION top_o_f;
 
-CREATE OR REPLACE FUNCTION top_o_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$  
-BEGIN  
-	RETURN QUERY   
-		SELECT p.tytul, p.id_produkcji 
-		FROM produkcje p  
-			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji   
-			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
-		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE 
-		GROUP BY p.tytul, p.id_produkcji 
-		ORDER BY count(o.id_odtworzenia) DESC 
-		LIMIT 50;   
+CREATE OR REPLACE FUNCTION top_o_f(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$   
+BEGIN   
+	RETURN QUERY    
+		SELECT p.tytul, p.id_produkcji  
+		FROM produkcje p   
+			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji    
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji   
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = FALSE   
+		GROUP BY p.tytul, p.id_produkcji  
+		ORDER BY count(o.id_odtworzenia) DESC  
+		LIMIT 50;    
 
-END;  
-$$ LANGUAGE plpgsql;   
+END;   
+$$ LANGUAGE plpgsql;    
 
 
 
 
 --seriali
 
-DROP VIEW top_o_seriali;  
-CREATE VIEW top_o_seriali AS  
-SELECT p.tytul, p.id_produkcji AS "Tytul"  
-FROM produkcje p   
-	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji  
-WHERE p.czy_serial = TRUE  
-GROUP BY p.tytul, p.id_produkcji 
-ORDER BY count(o.id_odtworzenia) DESC 
-LIMIT 50;  
+DROP VIEW top_o_seriali;   
+CREATE VIEW top_o_seriali AS   
+SELECT p.tytul, p.id_produkcji  AS id_p 
+FROM produkcje p    
+	JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji   
+WHERE p.czy_serial = TRUE   
+GROUP BY p.tytul, p.id_produkcji  
+ORDER BY count(o.id_odtworzenia) DESC  
+LIMIT 50;   
 
 
-CREATE OR REPLACE FUNCTION top_o_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$  
-BEGIN  
-	RETURN QUERY   
-		SELECT p.tytul, p.id_produkcji 
-		FROM produkcje p  
-			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji  
-			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
-		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE  
-		GROUP BY p.tytul, p.id_produkcji 
-		ORDER BY count(o.id_odtworzenia) DESC 
-		LIMIT 50;    
+DROP FUNCTION top_o_s;
+CREATE OR REPLACE FUNCTION top_o_s(id_kat INTEGER) RETURNS TABLE(tytul VARCHAR(255), id_p INTEGER) AS $$   
+BEGIN   
+	RETURN QUERY    
+		SELECT p.tytul, p.id_produkcji  
+		FROM produkcje p   
+			JOIN odtworzenia o ON o.id_produkcji = p.id_produkcji   
+			JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji   
+		WHERE w.id_kategorii = id_kat AND p.czy_serial = TRUE   
+		GROUP BY p.tytul, p.id_produkcji  
+		ORDER BY count(o.id_odtworzenia) DESC  
+		LIMIT 50;     
 
-END;  
-$$ LANGUAGE plpgsql;  
+END;   
+$$ LANGUAGE plpgsql;   
 									       
 									       
 									       
