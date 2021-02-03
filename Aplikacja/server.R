@@ -14,6 +14,10 @@ library("shinyBS")
 
 function(input, output, session){
   
+  
+  
+  #Reactives
+  #----
   credentials <- reactive({
     
     us <- as.data.table(dbGetQuery(con, "SELECT id_konta, haslo, email FROM konta;"))
@@ -59,7 +63,7 @@ function(input, output, session){
                             WHERE k.id_konta = '", id_konta(), "';")))
     
   })
-  
+  #===============
   
  
   
@@ -213,20 +217,28 @@ function(input, output, session){
                 fluidRow(
                   box(width = 5, 
                       tags$h2("Oglądaj dalej film!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                      dropdownButton(textInput("prod_findf", "Wyszukaj film", placeholder = "Tytuł"),
+                                     actionButton("confirm_findf", "Szukaj"),
+                                     icon = icon("search")),
                       dataTableOutput('odtworzenia_filmow'),
-                      textOutput("test"),
-                      dropdownButton(textInput("prod_find", "Wyszukaj film", placeholder = "Tytuł"),
-                                     actionButton("confirm_find", "Szukaj"),
-                                     icon = icon("search"))
+                      br(),
+                      br(),
+                      uiOutput("found_films")
+   
+                      #textOutput("test")
                       ),
+                  
                       uiOutput("watch_ui"),
+                  
                   box(width = 7, 
                       tags$h2("Oglądaj dalej serial!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      dataTableOutput('odtworzenia_seriali'),
-                      textOutput("test1"),
-                      dropdownButton(textInput("prod_find", "Wyszukaj serial", placeholder = "Tytuł"),
-                                     actionButton("confirm_find", "Szukaj"),
-                                     icon = icon("search"))),
+                      dropdownButton(textInput("prod_finds", "Wyszukaj serial", placeholder = "Tytuł"),
+                                     actionButton("confirm_finds", "Szukaj"),
+                                     icon = icon("search")),
+                      dataTableOutput('odtworzenia_seriali')
+                      #textOutput("test1"),
+                      ),
+                  
                     uiOutput("watch_ui2"),
                 )
               ),
@@ -370,13 +382,12 @@ function(input, output, session){
   
   
   ### OUTPUTY ############
-  
-  
-  
+   output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
 
   
-  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
-
+  
+  
+  
   output$logoutbtn <- renderUI({
     req(USER$login)
     tags$li(a(icon("sign-out"), "Wyloguj się", 
@@ -387,10 +398,19 @@ function(input, output, session){
   })
   
   
+
   
   
   
-  #Funkcja DO PRZYCISKÓW#============
+  
+    #Funkcja do removeUI
+  getInputs <- function(pattern){
+    reactives <- names(reactiveValuesToList(input))
+    reactives[grep(pattern,reactives)]
+  }
+  #===
+  
+    #Funkcja DO PRZYCISKÓW#============
   
     
     shinyInput <- function(FUN, len, id, ...) {
@@ -402,6 +422,79 @@ function(input, output, session){
     }
     #===
     
+
+  #Szukanie filmów
+  #----
+  
+  myValue7 <- reactiveValues(id = '',
+                            title = '',
+                            moment = '')
+  
+
+  
+found_butt <- reactive({
+    
+  data = data.table(
+          id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$id_produkcji,
+          Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$tytul,
+          Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rezyser,
+          Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$kraj,
+          Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$dlugosc_filmu,
+          Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rok_produkcji,
+          Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))),
+                             'ffbutton_', label = icon("plus") , 
+                             onclick = 'Shiny.onInputChange(\"select_buttonfound\",  this.id)'),
+          stringsAsFactors = FALSE)
+})
+  
+
+observeEvent(input$select_buttonfound, {
+  selectedRow <- as.numeric(strsplit(input$select_buttonfound, "_")[[1]][2])
+  myValue7$id <- found_butt()[selectedRow, id_p]
+  
+})
+
+
+  output$findf_tab <- DT::renderDataTable({
+    
+    
+    datatable(found_butt()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
+    
+  })
+  
+  
+  output$found_films <- renderUI({
+    req(input$confirm_findf)
+    wellPanel(
+    tags$h1("Wyszukane filmy", class = "text-center", style = "padding-top: 0; font-weight:200;"),
+    dataTableOutput("findf_tab")
+      )
+    })
+  
+
+  
+  
+observeEvent(input$select_buttonfound, {
+  
+  
+  res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue7$id, ", ", "'00:00:00');"))
+  dbClearResult(res)
+  showNotification("Dodano film do oglądania!", type = "message")
+  
+})
+ #==== 
+  
+  
+  
+  
+  
+
+  
+ 
+  
+  
+  
+
     
     
     ###### odtworzenia ###################
@@ -416,6 +509,7 @@ function(input, output, session){
     
     
     table_buttons_film <- reactive({
+      input$select_buttonfound
        input$addtowatch
       input$addtowatch3
       input$stop_moment_button
@@ -441,6 +535,8 @@ function(input, output, session){
       myValue$moment <- table_buttons_film()[selectedRow, 2]
     })
   
+    
+    
   
     output$test <- renderText({
       
