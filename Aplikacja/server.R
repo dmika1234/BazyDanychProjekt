@@ -216,29 +216,34 @@ function(input, output, session){
                 #---- 
                 fluidRow(
                   box(width = 5, 
-                      tags$h2("Oglądaj dalej film!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      dropdownButton(textInput("prod_findf", "Wyszukaj film", placeholder = "Tytuł"),
+                      dropdownButton(label = "asd", textInput("prod_findf", "Wyszukaj film", placeholder = "Tytuł"),
                                      actionButton("confirm_findf", "Szukaj"),
                                      icon = icon("search")),
-                      dataTableOutput('odtworzenia_filmow'),
-                      br(),
-                      br(),
-                      uiOutput("found_films")
-                      
+                      uiOutput("found_films"),
                       #textOutput("test")
                   ),
+                  
+                  box(width = 7, 
+                      dropdownButton(textInput("prod_finds", "Wyszukaj serial", placeholder = "Tytuł"),
+                                     actionButton("confirm_finds", "Szukaj"),
+                                     icon = icon("search")),
+                      uiOutput("found_series"),
+                      #textOutput("test1"),
+                  )),
+                  
+                  fluidRow(box(width = 5, 
+                      tags$h2("Oglądaj dalej film!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                      dataTableOutput('odtworzenia_filmow')
+                      #textOutput("test")
+                  ),
+                  
                   
                   uiOutput("watch_ui"),
                   
                   box(width = 7, 
                       tags$h2("Oglądaj dalej serial!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      dropdownButton(textInput("prod_finds", "Wyszukaj serial", placeholder = "Tytuł"),
-                                     actionButton("confirm_finds", "Szukaj"),
-                                     icon = icon("search")),
-                      dataTableOutput('odtworzenia_seriali'),
-                      br(),
-                      br(),
-                      uiOutput("found_series")
+                      dataTableOutput('odtworzenia_seriali')
+                    
                       #textOutput("test1"),
                   ),
                   
