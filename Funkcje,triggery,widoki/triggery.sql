@@ -249,3 +249,51 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER odcinki_check ON odcinki;
 CREATE TRIGGER odcinki_check BEFORE INSERT OR UPDATE ON odcinki FOR EACH ROW EXECUTE PROCEDURE odcinki_check();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--trigger żeby dzieci wyświetlały tylko dziecięce
+
+CREATE OR REPLACE FUNCTION dziecko_check() RETURNS TRIGGER AS $$
+DECLARE
+	uzytkownik RECORD;
+	produkcja RECORD;
+BEGIN
+	SELECT * INTO uzytkownik 
+	FROM uzytkownicy 
+	WHERE id_uzytkownika = NEW.id_uzytkownika;
+	
+	SELECT * INTO produkcja
+	FROM produkcje
+	WHERE id_produkcji = NEW.id_produkcji;
+	
+	IF(uzytkownik.czy_dziecko = TRUE) THEN
+		IF(produkcja.czy_dla_dzieci = FALSE) THEN
+			RAISE EXCEPTION 'Dzieci nie mogą tego oglądać!';
+		ELSE
+			RETURN NEW;
+		END IF;
+		
+	ELSE
+		RETURN NEW;	
+	END IF;	
+
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER dziecko_check ON odtworzenia;
+CREATE TRIGGER dziecko_check BEFORE INSERT OR UPDATE ON odtworzenia FOR EACH ROW EXECUTE PROCEDURE dziecko_check();
