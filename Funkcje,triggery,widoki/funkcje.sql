@@ -659,4 +659,87 @@ BEGIN
 	
 END; 
 $$ LANGUAGE plpgsql; 
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+											  
+--funkcja szukania filmu										  
+
+DROP FUNCTION szukaj_f;
+CREATE OR REPLACE FUNCTION szukaj_f(tyt VARCHAR(255), id_u INTEGER) 
+RETURNS TABLE(id_p INTEGER, tytul VARCHAR(255), rezyser VARCHAR(255), kraj VARCHAR, czy_serial BOOLEAN, dlugosc_filmu TIME, rok_produkcji INTEGER, czy_dla_dzieci BOOLEAN) AS $$   
+DECLARE
+	uzytkownik RECORD;
+BEGIN
+	SELECT * INTO uzytkownik 
+	FROM uzytkownicy 
+	WHERE id_uzytkownika = id_u;
+	
+		IF(uzytkownik.czy_dziecko = TRUE) THEN
+			RETURN QUERY
+				SELECT * 
+				FROM produkcje p 
+				WHERE UPPER(p.tytul) LIKE UPPER(CONCAT('%', tyt, '%'))
+					AND p.czy_serial = FALSE
+					AND p.czy_dla_dzieci = TRUE
+				ORDER BY p.tytul;
+			
+		ELSE
+			RETURN QUERY
+				SELECT * 
+				FROM produkcje p 
+				WHERE UPPER(p.tytul) LIKE UPPER(CONCAT('%', tyt, '%'))
+					AND p.czy_serial = FALSE
+				ORDER BY p.tytul;
+		
+		END IF;
+
+
+END;   
+$$ LANGUAGE plpgsql;  
+
+
+
+DROP FUNCTION szukaj_s;
+CREATE OR REPLACE FUNCTION szukaj_s(tyt VARCHAR(255), id_u INTEGER) 
+RETURNS TABLE(id_p INTEGER, tytul VARCHAR(255), rezyser VARCHAR(255), kraj VARCHAR, czy_serial BOOLEAN, dlugosc_filmu TIME, rok_produkcji INTEGER, czy_dla_dzieci BOOLEAN) AS $$   
+DECLARE
+	uzytkownik RECORD;
+BEGIN
+	SELECT * INTO uzytkownik 
+	FROM uzytkownicy 
+	WHERE id_uzytkownika = id_u;
+	
+		IF(uzytkownik.czy_dziecko = TRUE) THEN
+			RETURN QUERY
+				SELECT * 
+				FROM produkcje p 
+				WHERE UPPER(p.tytul) LIKE UPPER(CONCAT('%', tyt, '%'))
+					AND p.czy_serial = TRUE
+					AND p.czy_dla_dzieci = TRUE
+				ORDER BY p.tytul;
+			
+		ELSE
+			RETURN QUERY
+				SELECT * 
+				FROM produkcje p 
+				WHERE UPPER(p.tytul) LIKE UPPER(CONCAT('%', tyt, '%'))
+					AND p.czy_serial = TRUE
+				ORDER BY p.tytul;
+		
+		END IF;
+
+
+END;   
+$$ LANGUAGE plpgsql;  
+
 
