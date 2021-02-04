@@ -220,7 +220,7 @@ function(input, output, session){
                                      actionButton("confirm_findf", "Szukaj"),
                                      icon = icon("search")),
                       uiOutput("found_films"),
-                      #textOutput("test")
+                      textOutput("test"),
                   ),
                   
                   box(width = 7, 
@@ -228,7 +228,7 @@ function(input, output, session){
                                      actionButton("confirm_finds", "Szukaj"),
                                      icon = icon("search")),
                       uiOutput("found_series"),
-                      #textOutput("test1"),
+                      textOutput("test1"),
                   )),
                   
                   fluidRow(box(width = 5, 
@@ -238,7 +238,7 @@ function(input, output, session){
                   ),
                   
                   
-                  uiOutput("watch_ui"),
+                  
                   
                   box(width = 7, 
                       tags$h2("Oglądaj dalej serial!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
@@ -247,8 +247,10 @@ function(input, output, session){
                       #textOutput("test1"),
                   ),
                   
-                  uiOutput("watch_ui2"),
-                )
+                  ),
+                uiOutput("watch_ui"),
+                
+                uiOutput("watch_ui2"),
         ),
         #===============
         
@@ -606,16 +608,22 @@ function(input, output, session){
     input$addtowatch3
     input$stop_moment_button
     
-    data = data.frame(
-      Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$tytul,
-      Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$moment_zatrzymania,
-      Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))),
+    
+    dane <- dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))
+    
+
+    
+    data = data.table(
+      Tytuł = dane$tytul,
+      Zatrzymanie = dane$moment_zatrzymania,
+      Akcje = shinyInput(actionButton, nrow(dane),
                          'button_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
                                                      <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
                                                      <i class="far fa-comment"></i>') , 
                          onclick = 'Shiny.onInputChange(\"select_buttonfilm\",  this.id)' ),
-      id_produkcji = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$id_p,
+      id_produkcji = dane$id_p,
       stringsAsFactors = FALSE)
+    
   })
   
   
@@ -623,9 +631,10 @@ function(input, output, session){
   
   observeEvent(input$select_buttonfilm, {
     selectedRow <- as.numeric(strsplit(input$select_buttonfilm, "_")[[1]][2])
-    myValue$id <- table_buttons_film()[selectedRow, 4]
-    myValue$title <- table_buttons_film()[selectedRow, 1]
-    myValue$moment <- table_buttons_film()[selectedRow, 2]
+    myValue$id <- table_buttons_film()[selectedRow, id_produkcji]
+    myValue$title <- table_buttons_film()[selectedRow, Tytuł]
+    myValue$moment <- table_buttons_film()[selectedRow, Zatrzymanie]
+    myValue$max <- dbGetQuery(con, paste0("SELECT dlugosc_filmu FROM produkcje WHERE id_produkcji=", myValue$id, ";"))$dlugosc_filmu
   })
   
   
@@ -639,16 +648,19 @@ function(input, output, session){
   })
   
   
-  output$watch_ui <- renderUI({
-    req(input$select_buttonfilm)
+  
+  observeEvent(input$select_buttonfilm, ignoreInit = TRUE, {
+    output$watch_ui <- renderUI({
+    
+      
+  showModal(
+        
+
     modalDialog(
       fluidRow(box(width = 12,
                    sliderInput("stop_moment_film", "Oglądaj dalej!",   
                   min = as.POSIXct("2017-01-01 00:00:00"),   
-                  max = as.POSIXct(paste("2017-01-01",
-                                         dbGetQuery(con,
-                                                    paste0("SELECT dlugosc_filmu FROM produkcje WHERE id_produkcji="
-                                                           , myValue$id, ";"))$dlugosc_filmu, sep = " ")),   
+                  max = as.POSIXct(paste("2017-01-01", myValue$max, sep = " ")),   
                   value = as.POSIXct(paste("2017-01-01", myValue$moment, sep = " ")),   
                   timeFormat="%T",   
                   step = 30, animate = T, ticks = F),
@@ -671,7 +683,13 @@ function(input, output, session){
       
       
     )
+  )
+      
   })
+
+})
+  
+  
   
   observeEvent(input$stop_moment_button, {
     res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue$id, ", '",
@@ -742,25 +760,26 @@ function(input, output, session){
     input$addtowatch4
     input$stop_moment_button2
     
+    dane <- dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))
+    
     
     data = data.table(
-      Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul,
-      Tytuł_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul_odcinka,
-      Nr_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$nr_odcinka,
-      Nr_sezonu = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$nr_sezonu,
-      Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$moment_zatrzymania,
-      Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))),
-                         'sbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
-                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
-                                                     <i class="far fa-comment"></i>'), onclick = 'Shiny.onInputChange(\"select_buttonserial\",  this.id)' ),
-      id_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$id_o,
-      id_prod = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$id_p,
+      Tytuł = dane$tytul,
+      Tytuł_odcinka = dane$tytul_odcinka,
+      Nr_odcinka = dane$nr_odcinka,
+      Nr_sezonu = dane$nr_sezonu,
+      Zatrzymanie = dane$moment_zatrzymania,
+      Akcje = shinyInput(actionButton, nrow(dane), 'sbutton_',
+                         label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;<i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; <i class="far fa-comment"></i>'),
+                         onclick = 'Shiny.onInputChange(\"select_buttonserial\",  this.id);' ),
+      id_odcinka = dane$id_o,
+      id_prod = dane$id_p,
       stringsAsFactors = FALSE)
     
-    
+    #'Shiny.onInputChange(\"trigger\", Math.random());'
     
   })
-  
+
   
   
   observeEvent(input$select_buttonserial, {
@@ -769,6 +788,7 @@ function(input, output, session){
     myValue2$id_p <- table_buttons_serial()[selectedRow, id_prod]
     myValue2$title <- table_buttons_serial()[selectedRow, Tytuł]
     myValue2$moment <- table_buttons_serial()[selectedRow, Zatrzymanie]
+    myValue2$max <- dbGetQuery(con, paste0("SELECT dlugosc_odcinka FROM odcinki WHERE id_odcinka=", myValue2$id, ";"))$dlugosc_odcinka
   })
   
   
@@ -777,20 +797,22 @@ function(input, output, session){
     
     as.character(myValue2$moment)
     
+    
   })
   
   
-  output$watch_ui2 <- renderUI({
-    req(input$select_buttonserial)
+  
+  
+  observeEvent(input$select_buttonserial, ignoreInit = TRUE, {
+    output$watch_ui2 <- renderUI({
+   
+    showModal(
     modalDialog(
       
       fluidRow(box(width=12,
                   sliderInput("stop_moment_serial", "Oglądaj dalej!",   
                   min = as.POSIXct("2017-01-01 00:00:00"),   
-                  max = as.POSIXct(paste("2017-01-01",
-                                         dbGetQuery(con,
-                                                    paste0("SELECT dlugosc_odcinka FROM odcinki WHERE id_odcinka="
-                                                           , myValue2$id, ";"))$dlugosc_odcinka, sep = " ")),   
+                  max = as.POSIXct(paste("2017-01-01", myValue2$max, sep = " ")),   
                   value = as.POSIXct(paste("2017-01-01", myValue2$moment, sep = " ")),   
                   timeFormat="%T",   
                   step = 30, animate = T, ticks = F),
@@ -812,6 +834,8 @@ function(input, output, session){
                    
                    ))
         )
+    )
+   
   })
   
   
@@ -826,6 +850,11 @@ function(input, output, session){
     
     
   })
+    
+    
+  })
+ 
+  
   
   
   
@@ -931,10 +960,12 @@ function(input, output, session){
   
   
   
-  
+observeEvent(input$select_buttontopf, ignoreInit = TRUE, {  
   output$watch_ui3 <- renderUI({
-    req(input$select_buttontopf)
-    modalDialog(
+    
+    
+      showModal(
+      modalDialog(
       fluidRow(box(width = 12,
         actionButton("addtowatch", "Dodaj film do oglądania")
       )),
@@ -953,8 +984,10 @@ function(input, output, session){
       actionButton("add_top_kom", "Dodaj komentarz")
      ))
   )
-    
-  })
+) 
+      
+    })
+ })
   
   
   observeEvent(input$addtowatch, {
@@ -1035,9 +1068,14 @@ function(input, output, session){
   })
   
   
+  
+  
+ observeEvent(input$select_buttontops, ignoreInit = TRUE, { 
   output$watch_ui4 <- renderUI({
-    req(input$select_buttontops)
-    modalDialog(
+    
+    
+      showModal(
+      modalDialog(
       fluidRow(box(width=12,
                    actionButton("addtowatch2", "Dodaj serial do oglądania")
       )),
@@ -1051,6 +1089,12 @@ function(input, output, session){
                   actionButton("add_ocena_top2", "Zatwierdź ocenę")
       ))
     )
+      
+)
+      
+    })
+   
+    
   })
   
   
@@ -1136,8 +1180,11 @@ function(input, output, session){
   })
   
   
-  output$watch_ui5 <- renderUI({
-    req(input$select_buttontopof)
+  
+  
+observeEvent(input$select_buttontopof, ignoreInit = TRUE, {
+   output$watch_ui5 <- renderUI({
+    showModal(
     modalDialog(
       fluidRow(box(width=12,
                    actionButton("addtowatch3", "Dodaj film do oglądania")
@@ -1157,9 +1204,14 @@ function(input, output, session){
                   actionButton("add_top_kom3", "Dodaj komentarz")
       ))
      
-      
     )
+  )
   })
+  
+  
+})  
+  
+ 
   
   
   observeEvent(input$addtowatch3, {
@@ -1251,8 +1303,9 @@ function(input, output, session){
   
   
   
-  output$watch_ui6 <- renderUI({
-    req(input$select_buttontopos)
+observeEvent(input$select_buttontopos, ignoreInit =  TRUE, {
+   output$watch_ui6 <- renderUI({
+    showModal(
     modalDialog(
       fluidRow(box(width=12, 
                    actionButton("addtowatch4", "Dodaj serial do oglądania")
@@ -1266,9 +1319,13 @@ function(input, output, session){
                   ),
                   actionButton("add_ocena_top4", "Zatwierdź ocenę")
       ))
-      
+      )
     )
   })
+
+})  
+  
+ 
   
   
   
