@@ -637,8 +637,8 @@ function(input, output, session){
   output$watch_ui <- renderUI({
     req(input$select_buttonfilm)
     modalDialog(
-      
-      sliderInput("stop_moment_film", "Oglądaj dalej!",   
+      fluidRow(box(width = 12,
+                   sliderInput("stop_moment_film", "Oglądaj dalej!",   
                   min = as.POSIXct("2017-01-01 00:00:00"),   
                   max = as.POSIXct(paste("2017-01-01",
                                          dbGetQuery(con,
@@ -647,15 +647,23 @@ function(input, output, session){
                   value = as.POSIXct(paste("2017-01-01", myValue$moment, sep = " ")),   
                   timeFormat="%T",   
                   step = 30, animate = T, ticks = F),
-      actionButton("stop_moment_button", "Zatwierdź czas"),
-      radioGroupButtons(
-        inputId = "ocena_odtw",
-        label = "Oceń film",
-        choices = 1:10
-      ),
-      actionButton("add_ocena_film", "Zatwierdź ocenę"),
-      textInput("odt_kom", "Skomentuj film!"),
-      actionButton("add_film_kom", "Dodaj komentarz")
+                  actionButton("stop_moment_button", "Zatwierdź czas")
+      )),
+      
+      fluidRow(box(width = 12,
+                   radioGroupButtons(
+                    inputId = "ocena_odtw",
+                    label = "Oceń film",
+                    choices = 1:10
+                  ),
+                  actionButton("add_ocena_film", "Zatwierdź ocenę")
+      )),
+      
+      fluidRow(box(width = 12,
+                   textInput("odt_kom", "Skomentuj film!"),
+                    actionButton("add_film_kom", "Dodaj komentarz")
+      ))
+      
       
     )
   })
@@ -769,7 +777,8 @@ function(input, output, session){
     req(input$select_buttonserial)
     modalDialog(
       
-      sliderInput("stop_moment_serial", "Oglądaj dalej!",   
+      fluidRow(box(width=12,
+                  sliderInput("stop_moment_serial", "Oglądaj dalej!",   
                   min = as.POSIXct("2017-01-01 00:00:00"),   
                   max = as.POSIXct(paste("2017-01-01",
                                          dbGetQuery(con,
@@ -778,17 +787,23 @@ function(input, output, session){
                   value = as.POSIXct(paste("2017-01-01", myValue2$moment, sep = " ")),   
                   timeFormat="%T",   
                   step = 30, animate = T, ticks = F),
-      actionButton("stop_moment_button2", "Zatwierdź czas"),
-      radioGroupButtons(
-        inputId = "ocena_odtw2",
-        label = "Oceń serial",
-        choices = 1:10
-      ),
-      actionButton("add_ocena_serial", "Zatwierdź ocenę"),
-      textInput("odt_kom2", "Skomentuj odcinek"),
-      actionButton("add_serial_kom", "Dodaj komentarz")
-      
-    )
+                  actionButton("stop_moment_button2", "Zatwierdź czas")
+                   
+            )),
+      fluidRow(box(width = 12,
+                   radioGroupButtons(
+                    inputId = "ocena_odtw2",
+                    label = "Oceń serial",
+                    choices = 1:10
+                  ),
+                  actionButton("add_ocena_serial", "Zatwierdź ocenę")
+            )),
+      fluidRow(box(width = 12,
+                   textInput("odt_kom2", "Skomentuj odcinek"),
+                    actionButton("add_serial_kom", "Dodaj komentarz")
+                   
+                   ))
+        )
   })
   
   
@@ -892,17 +907,25 @@ function(input, output, session){
   output$watch_ui3 <- renderUI({
     req(input$select_buttontopf)
     modalDialog(
-      actionButton("addtowatch", "Dodaj film do oglądania"),
-      radioGroupButtons(
-        inputId = "ocena_top",
-        label = "Oceń film",
-        choices = 1:10
-      ),
-      actionButton("add_ocena_top", "Zatwierdź ocenę"),
+      fluidRow(box(width = 12,
+        actionButton("addtowatch", "Dodaj film do oglądania")
+      )),
+      
+      fluidRow(box(width = 12,
+          radioGroupButtons(
+          inputId = "ocena_top",
+          label = "Oceń film",
+          choices = 1:10
+        ),
+        actionButton("add_ocena_top", "Zatwierdź ocenę")
+      )),
+      
+    fluidRow(box(width = 12,
       textInput("top_kom", "Skomentuj produkcję"),
       actionButton("add_top_kom", "Dodaj komentarz")
-      
-    )
+     ))
+  )
+    
   })
   
   
@@ -987,14 +1010,18 @@ function(input, output, session){
   output$watch_ui4 <- renderUI({
     req(input$select_buttontops)
     modalDialog(
-      actionButton("addtowatch2", "Dodaj serial do oglądania"),
-      radioGroupButtons(
-        inputId = "ocena_top2",
-        label = "Oceń serial",
-        choices = 1:10
-      ),
-      actionButton("add_ocena_top2", "Zatwierdź ocenę")
+      fluidRow(box(width=12,
+                   actionButton("addtowatch2", "Dodaj serial do oglądania")
+      )),
       
+      fluidRow(box(width=12,
+                   radioGroupButtons(
+                    inputId = "ocena_top2",
+                    label = "Oceń serial",
+                    choices = 1:10
+                  ),
+                  actionButton("add_ocena_top2", "Zatwierdź ocenę")
+      ))
     )
   })
   
@@ -1084,15 +1111,24 @@ function(input, output, session){
   output$watch_ui5 <- renderUI({
     req(input$select_buttontopof)
     modalDialog(
-      actionButton("addtowatch3", "Dodaj film do oglądania"),
-      radioGroupButtons(
-        inputId = "ocena_top3",
-        label = "Oceń film",
-        choices = 1:10
-      ),
-      actionButton("add_ocena_top3", "Zatwierdź ocenę"),
-      textInput("top_kom3", "Skomentuj produkcję"),
-      actionButton("add_top_kom3", "Dodaj komentarz")
+      fluidRow(box(width=12,
+                   actionButton("addtowatch3", "Dodaj film do oglądania")
+                   )),
+      
+      fluidRow(box(width=12,
+                   radioGroupButtons(
+                  inputId = "ocena_top3",
+                  label = "Oceń film",
+                  choices = 1:10
+                ),
+                actionButton("add_ocena_top3", "Zatwierdź ocenę")
+      )),
+      
+      fluidRow(box(width=12, 
+                   textInput("top_kom3", "Skomentuj produkcję"),
+                  actionButton("add_top_kom3", "Dodaj komentarz")
+      ))
+     
       
     )
   })
@@ -1190,13 +1226,18 @@ function(input, output, session){
   output$watch_ui6 <- renderUI({
     req(input$select_buttontopos)
     modalDialog(
-      actionButton("addtowatch4", "Dodaj serial do oglądania"),
-      radioGroupButtons(
-        inputId = "ocena_top4",
-        label = "Oceń serial",
-        choices = 1:10
-      ),
-      actionButton("add_ocena_top4", "Zatwierdź ocenę"),
+      fluidRow(box(width=12, 
+                   actionButton("addtowatch4", "Dodaj serial do oglądania")
+      )),
+      
+      fluidRow(box(width=12,
+                   radioGroupButtons(
+                    inputId = "ocena_top4",
+                    label = "Oceń serial",
+                    choices = 1:10
+                  ),
+                  actionButton("add_ocena_top4", "Zatwierdź ocenę")
+      ))
       
     )
   })
