@@ -736,10 +736,12 @@ function(input, output, session){
   
   table_buttons_serial <- reactive({
     
+    input$next_episode
     input$select_buttonfounds
     input$addtowatch2
     input$addtowatch4
     input$stop_moment_button2
+    
     
     data = data.table(
       Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul,
@@ -792,7 +794,8 @@ function(input, output, session){
                   value = as.POSIXct(paste("2017-01-01", myValue2$moment, sep = " ")),   
                   timeFormat="%T",   
                   step = 30, animate = T, ticks = F),
-                  actionButton("stop_moment_button2", "Zatwierdź czas")
+                  actionButton("stop_moment_button2", "Zatwierdź czas"),
+                  actionButton("next_episode", "Oglądaj dalej")
                    
             )),
       fluidRow(box(width = 12,
@@ -812,11 +815,30 @@ function(input, output, session){
   })
   
   
+  observeEvent(input$next_episode, {
+    id_o <- dbGetQuery(con, paste0("SELECT id_kolejnego_odcinka(",myValue2$id, ");"))
+    res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", id_o, ", '00:00:00');"))
+    dbFetch(res)
+    if(dbHasCompleted(res)){
+      showNotification("Dodano kolejny odcinek do oglądania!", type = "message")
+    }
+    dbClearResult(res)
+    
+    
+  })
+  
+  
+  
   
   observeEvent(input$stop_moment_button2, {
     res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", myValue2$id, ", '",
                                    str_extract(input$stop_moment_serial+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
-    showNotification("Miło się oglądało?", type = "message")
+    dbFetch(res)
+    if(dbHasCompleted(res)){
+      showNotification("Miło się oglądało?", type = "message")
+      }
+    dbClearResult(res)
+    
   })
   
   
@@ -902,9 +924,10 @@ function(input, output, session){
   
   output$top_filmy  <-  DT::renderDataTable({
     
-    
     datatable(table_buttons_topf()[, -4], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
+    
   })
+  
   
   
   
