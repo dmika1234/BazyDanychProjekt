@@ -9,15 +9,12 @@ require("RPostgres")
 require(data.table)
 library("dashboardthemes")
 library("shinyBS")
+#
 
 tags$style("@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);")
 
-# title <- tags$li(class = "dropdown",
-#                  tags$a(href='https://www.google.com',
-#                 icon("diamond"),
-#                 'Diamonds Explorer', target="_blank"))
-
-header <- dashboardHeader( title = "Filmex",  uiOutput("logoutbtn"))
+header <- dashboardHeader(title = span(img(src="logo1.png", width = '130px')),
+                          uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 
@@ -26,3 +23,8 @@ body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"),
                         theme = "flat_red"
                       ))
 dashboardPage(header, sidebar, body)
+
+
+
+
+
