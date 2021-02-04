@@ -235,7 +235,10 @@ function(input, output, session){
                       dropdownButton(textInput("prod_finds", "Wyszukaj serial", placeholder = "Tytuł"),
                                      actionButton("confirm_finds", "Szukaj"),
                                      icon = icon("search")),
-                      dataTableOutput('odtworzenia_seriali')
+                      dataTableOutput('odtworzenia_seriali'),
+                      br(),
+                      br(),
+                      uiOutput("found_series")
                       #textOutput("test1"),
                       ),
                   
@@ -408,6 +411,11 @@ function(input, output, session){
     reactives <- names(reactiveValuesToList(input))
     reactives[grep(pattern,reactives)]
   }
+  
+  getOutputs <- function(pattern){
+    reactives <- names(reactiveValuesToList(output))
+    reactives[grep(pattern,reactives)]
+  }
   #===
   
     #Funkcja DO PRZYCISKÓW#============
@@ -422,6 +430,10 @@ function(input, output, session){
     }
     #===
     
+  
+  
+  
+  
 
   #Szukanie filmów
   #----
@@ -482,10 +494,84 @@ observeEvent(input$select_buttonfound, {
   showNotification("Dodano film do oglądania!", type = "message")
   
 })
+
+
+
+
+
+
  #==== 
   
   
   
+
+
+
+
+
+  #Szukanie seriali
+  #----
+myValue8 <- reactiveValues(id = '')
+
+
+
+found_butts <- reactive({
+  
+  data = data.table(
+    id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$id_produkcji,
+    Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$tytul,
+    Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rezyser,
+    Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$kraj,
+    Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$dlugosc_filmu,
+    Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rok_produkcji,
+    Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))),
+                         'ssbutton_', label = icon("plus") , 
+                         onclick = 'Shiny.onInputChange(\"select_buttonfounds\",  this.id)'),
+    stringsAsFactors = FALSE)
+})
+
+
+observeEvent(input$select_buttonfounds, {
+  selectedRow <- as.numeric(strsplit(input$select_buttonfounds, "_")[[1]][2])
+  myValue8$id <- found_butts()[selectedRow, id_p]
+  
+})
+
+
+output$finds_tab <- DT::renderDataTable({
+  
+  
+  datatable(found_butts()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
+  
+})
+
+
+output$found_series <- renderUI({
+  req(input$confirm_finds)
+  wellPanel(
+    tags$h1("Wyszukane seriale", class = "text-center", style = "padding-top: 0; font-weight:200;"),
+    dataTableOutput("finds_tab")
+  )
+})
+
+
+
+
+observeEvent(input$select_buttonfounds, {
+  
+  id_odc <- dbGetQuery(con, paste0("SELECT id_odcinka FROM odcinki WHERE nr_odcinka = 1 AND nr_sezonu = 1 AND id_produkcji = "
+                                   , myValue8$id))$id_odcinka
+  
+  res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", id_odc, ", ", "'00:00:00');"))
+  dbClearResult(res)
+  showNotification("Dodano serial do oglądania!", type = "message")
+  
+})
+
+
+
+
+  #============
   
   
 
@@ -509,10 +595,12 @@ observeEvent(input$select_buttonfound, {
     
     
     table_buttons_film <- reactive({
+      
       input$select_buttonfound
-       input$addtowatch
+      input$addtowatch
       input$addtowatch3
       input$stop_moment_button
+      
       data = data.frame(
         Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$tytul,
         Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$moment_zatrzymania,
@@ -634,9 +722,12 @@ observeEvent(input$select_buttonfound, {
   
   
   table_buttons_serial <- reactive({
+    
+    input$select_buttonfounds
     input$addtowatch2
     input$addtowatch4
     input$stop_moment_button2
+    
     data = data.table(
       Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul,
       Tytuł_odcinka = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$tytul_odcinka,
