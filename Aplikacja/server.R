@@ -49,10 +49,10 @@ function(input, output, session){
   uzytkownicy_konta <- reactive({
     #a <- input$uz_add_fin
     dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
-
-
+    
+    
   })
-
+  
   
   
   max_uz <- reactive({
@@ -65,7 +65,7 @@ function(input, output, session){
   })
   #===============
   
- 
+  
   
   #Panel Logowanie==============================================================================================================================  
   #----
@@ -116,13 +116,13 @@ function(input, output, session){
                                        input$reg_email,"', '", input$reg_passwd, "','", input$reg_plan, "');"))
         
         dbFetch(res)
-      if(dbHasCompleted(res)){
-        showNotification("Konto dodano pomyślnie!", type = "message") 
-        
-      }
+        if(dbHasCompleted(res)){
+          showNotification("Konto dodano pomyślnie!", type = "message") 
+          
+        }
         
         dbClearResult(res)
-      
+        
       },
       error = function(err){
         showNotification(paste0("Podany e-mail nie istnieje!"), type = 'err')
@@ -133,17 +133,17 @@ function(input, output, session){
     }
     
     
-        
+    
   })
   
   
   #============================================================================================================================================  
   
   
-
-
   
-
+  
+  
+  
   
   
   #Panel boczny po zalogowaniu===================================================================================================================  
@@ -163,10 +163,10 @@ function(input, output, session){
     }
   })
   
-
+  
   #===============================================================================================================================================
   
-
+  
   
   #Główna treść apki=============================================================================================================================== 
   #----
@@ -176,20 +176,20 @@ function(input, output, session){
         tabItem(tabName ="konto", class = "active",
                 #----
                 box(width = 12, 
-                  tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                  radioGroupButtons(
-                    inputId = "uzytkownik",
-                    choiceNames =  uzytkownicy_konta()$nazwa,
-                    choiceValues = uzytkownicy_konta()$id_uzytkownika,
-                    size='lg',
-                    direction = "horizontal",
-                    justified = TRUE,
-                    width = '100%',
-                    individual = TRUE
-                  ),
-                  div(
-                    style = "text-align: center;",
-                    actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
+                    tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                    radioGroupButtons(
+                      inputId = "uzytkownik",
+                      choiceNames =  uzytkownicy_konta()$nazwa,
+                      choiceValues = uzytkownicy_konta()$id_uzytkownika,
+                      size='lg',
+                      direction = "horizontal",
+                      justified = TRUE,
+                      width = '100%',
+                      individual = TRUE
+                    ),
+                    div(
+                      style = "text-align: center;",
+                      actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
                     bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
                             wellPanel(
                               textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
@@ -204,14 +204,14 @@ function(input, output, session){
                             )
                     ),
                     box(width = 5, 
-                    tags$h2("Ostatnie płatności", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                    dataTableOutput('platnosci')
-                  
-                ))
+                        tags$h2("Ostatnie płatności", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                        dataTableOutput('platnosci')
+                        
+                    ))
                 
-                ),
+        ),
         #=======================
-       
+        
         tabItem(tabName ="ogladanie",
                 #---- 
                 fluidRow(
@@ -224,11 +224,11 @@ function(input, output, session){
                       br(),
                       br(),
                       uiOutput("found_films")
-   
+                      
                       #textOutput("test")
-                      ),
+                  ),
                   
-                      uiOutput("watch_ui"),
+                  uiOutput("watch_ui"),
                   
                   box(width = 7, 
                       tags$h2("Oglądaj dalej serial!", class = "text-center", style = "padding-top: 0; font-weight:600;"),
@@ -240,18 +240,18 @@ function(input, output, session){
                       br(),
                       uiOutput("found_series")
                       #textOutput("test1"),
-                      ),
+                  ),
                   
-                    uiOutput("watch_ui2"),
+                  uiOutput("watch_ui2"),
                 )
-              ),
+        ),
         #===============
         
         tabItem(tabName ="komentarze", 
                 #----
-                ),
-       #================
-       
+        ),
+        #================
+        
         tabItem(tabName ="topy",
                 #----
                 tags$h1("Jakie produkcje użytkownicy oceniają najlepiej?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
@@ -262,10 +262,10 @@ function(input, output, session){
                         inputId = "kat_f",
                         label = "Posortuj po kategorii:",
                         choiceNames = c("Wszystkie",
-                                    "Animowany", "Biograficzny", "Dokumentalny", 
-                                    "Dramat", "Historyczny",
-                                    "Horror"  , "Komedia", "Musical", "Romantyczny",
-                                    "Sci-fi", "Thriller", "Western"),
+                                        "Animowany", "Biograficzny", "Dokumentalny", 
+                                        "Dramat", "Historyczny",
+                                        "Horror"  , "Komedia", "Musical", "Romantyczny",
+                                        "Sci-fi", "Thriller", "Western"),
                         choiceValues = c(0, 12, 2, 22, 18, 9, 19, 11, 10, 4, 20, 3, 14)
                       ),
                       dataTableOutput('top_filmy')),
@@ -278,10 +278,10 @@ function(input, output, session){
                         inputId = "kat_s",
                         label = "Posortuj po kategorii:",
                         choiceNames = c("Wszystkie",
-                                    "Animowany", "Biograficzny", "Dokumentalny", 
-                                    "Dramat", "Historyczny",
-                                    "Horror"  , "Komedia", "Musical", "Romantyczny",
-                                    "Sci-fi", "Thriller", "Western"),
+                                        "Animowany", "Biograficzny", "Dokumentalny", 
+                                        "Dramat", "Historyczny",
+                                        "Horror"  , "Komedia", "Musical", "Romantyczny",
+                                        "Sci-fi", "Thriller", "Western"),
                         choiceValues = c(0, 12, 2, 22, 18, 9, 19, 11, 10, 4, 20, 3, 14)
                       ),
                       dataTableOutput('top_seriale')),
@@ -303,8 +303,8 @@ function(input, output, session){
                         choiceValues = c(0, 12, 2, 22, 18, 9, 19, 11, 10, 4, 20, 3, 14)
                       ),
                       dataTableOutput('top_o_filmy')
-                      ),
-                    uiOutput("watch_ui5"),
+                  ),
+                  uiOutput("watch_ui5"),
                   
                   
                   box(width = 6, 
@@ -320,14 +320,14 @@ function(input, output, session){
                         choiceValues = c(0, 12, 2, 22, 18, 9, 19, 11, 10, 4, 20, 3, 14)
                       ),
                       dataTableOutput('top_o_seriale')
-                      ),
+                  ),
                   uiOutput("watch_ui6")
                   
                 )
         )
-      #=========
+        #=========
       )
-          
+      
     }
     else {
       loginpage
@@ -335,7 +335,7 @@ function(input, output, session){
   })
   #=========================================================================================================================================
   
-
+  
   
   
   #Dodawaniu uzytkownika  
@@ -385,8 +385,8 @@ function(input, output, session){
   
   
   ### OUTPUTY ############
-   output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
-
+  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
+  
   
   
   
@@ -401,12 +401,12 @@ function(input, output, session){
   })
   
   
-
   
   
   
   
-    #Funkcja do removeUI
+  
+  #Funkcja do removeUI
   getInputs <- function(pattern){
     reactives <- names(reactiveValuesToList(input))
     reactives[grep(pattern,reactives)]
@@ -418,55 +418,55 @@ function(input, output, session){
   }
   #===
   
-    #Funkcja DO PRZYCISKÓW#============
+  #Funkcja DO PRZYCISKÓW#============
   
-    
-    shinyInput <- function(FUN, len, id, ...) {
-      inputs <- character(len)
-      for (i in seq_len(len)) {
-        inputs[i] <- as.character(FUN(paste0(id, i), ...))
-      }
-      inputs
+  
+  shinyInput <- function(FUN, len, id, ...) {
+    inputs <- character(len)
+    for (i in seq_len(len)) {
+      inputs[i] <- as.character(FUN(paste0(id, i), ...))
     }
-    #===
-    
+    inputs
+  }
+  #===
   
   
   
   
-
+  
+  
   #Szukanie filmów
   #----
   
   myValue7 <- reactiveValues(id = '',
-                            title = '',
-                            moment = '')
+                             title = '',
+                             moment = '')
   
-
   
-found_butt <- reactive({
+  
+  found_butt <- reactive({
     
-  data = data.table(
-          id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$id_produkcji,
-          Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$tytul,
-          Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rezyser,
-          Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$kraj,
-          Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$dlugosc_filmu,
-          Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rok_produkcji,
-          Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))),
-                             'ffbutton_', label = icon("plus") , 
-                             onclick = 'Shiny.onInputChange(\"select_buttonfound\",  this.id)'),
-          stringsAsFactors = FALSE)
-})
+    data = data.table(
+      id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$id_produkcji,
+      Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$tytul,
+      Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rezyser,
+      Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$kraj,
+      Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$dlugosc_filmu,
+      Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rok_produkcji,
+      Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))),
+                           'ffbutton_', label = icon("plus") , 
+                           onclick = 'Shiny.onInputChange(\"select_buttonfound\",  this.id)'),
+      stringsAsFactors = FALSE)
+  })
   
-
-observeEvent(input$select_buttonfound, {
-  selectedRow <- as.numeric(strsplit(input$select_buttonfound, "_")[[1]][2])
-  myValue7$id <- found_butt()[selectedRow, id_p]
   
-})
-
-
+  observeEvent(input$select_buttonfound, {
+    selectedRow <- as.numeric(strsplit(input$select_buttonfound, "_")[[1]][2])
+    myValue7$id <- found_butt()[selectedRow, id_p]
+    
+  })
+  
+  
   output$findf_tab <- DT::renderDataTable({
     
     
@@ -478,229 +478,229 @@ observeEvent(input$select_buttonfound, {
   output$found_films <- renderUI({
     req(input$confirm_findf)
     wellPanel(
-    tags$h1("Wyszukane filmy", class = "text-center", style = "padding-top: 0; font-weight:200;"),
-    dataTableOutput("findf_tab")
-      )
-    })
-  
-
-  
-  
-observeEvent(input$select_buttonfound, {
-  
-  
-  res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue7$id, ", ", "'00:00:00');"))
-  dbClearResult(res)
-  showNotification("Dodano film do oglądania!", type = "message")
-  
-})
-
-
-
-
-
-
- #==== 
+      tags$h1("Wyszukane filmy", class = "text-center", style = "padding-top: 0; font-weight:200;"),
+      dataTableOutput("findf_tab")
+    )
+  })
   
   
   
-
-
-
-
-
+  
+  observeEvent(input$select_buttonfound, {
+    
+    
+    res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue7$id, ", ", "'00:00:00');"))
+    dbClearResult(res)
+    showNotification("Dodano film do oglądania!", type = "message")
+    
+  })
+  
+  
+  
+  
+  
+  
+  #==== 
+  
+  
+  
+  
+  
+  
+  
+  
   #Szukanie seriali
   #----
-myValue8 <- reactiveValues(id = '')
-
-
-
-found_butts <- reactive({
-  
-  data = data.table(
-    id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$id_produkcji,
-    Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$tytul,
-    Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rezyser,
-    Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$kraj,
-    Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$dlugosc_filmu,
-    Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rok_produkcji,
-    Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))),
-                         'ssbutton_', label = icon("plus") , 
-                         onclick = 'Shiny.onInputChange(\"select_buttonfounds\",  this.id)'),
-    stringsAsFactors = FALSE)
-})
-
-
-observeEvent(input$select_buttonfounds, {
-  selectedRow <- as.numeric(strsplit(input$select_buttonfounds, "_")[[1]][2])
-  myValue8$id <- found_butts()[selectedRow, id_p]
-  
-})
-
-
-output$finds_tab <- DT::renderDataTable({
+  myValue8 <- reactiveValues(id = '')
   
   
-  datatable(found_butts()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
   
-})
-
-
-output$found_series <- renderUI({
-  req(input$confirm_finds)
-  wellPanel(
-    tags$h1("Wyszukane seriale", class = "text-center", style = "padding-top: 0; font-weight:200;"),
-    dataTableOutput("finds_tab")
-  )
-})
-
-
-
-
-observeEvent(input$select_buttonfounds, {
+  found_butts <- reactive({
+    
+    data = data.table(
+      id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$id_produkcji,
+      Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$tytul,
+      Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rezyser,
+      Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$kraj,
+      Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$dlugosc_filmu,
+      Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rok_produkcji,
+      Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))),
+                           'ssbutton_', label = icon("plus") , 
+                           onclick = 'Shiny.onInputChange(\"select_buttonfounds\",  this.id)'),
+      stringsAsFactors = FALSE)
+  })
   
-  id_odc <- dbGetQuery(con, paste0("SELECT id_odcinka FROM odcinki WHERE nr_odcinka = 1 AND nr_sezonu = 1 AND id_produkcji = "
-                                   , myValue8$id))$id_odcinka
   
-  res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", id_odc, ", ", "'00:00:00');"))
-  dbClearResult(res)
-  showNotification("Dodano serial do oglądania!", type = "message")
+  observeEvent(input$select_buttonfounds, {
+    selectedRow <- as.numeric(strsplit(input$select_buttonfounds, "_")[[1]][2])
+    myValue8$id <- found_butts()[selectedRow, id_p]
+    
+  })
   
-})
-
-
-
-
+  
+  output$finds_tab <- DT::renderDataTable({
+    
+    
+    datatable(found_butts()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
+    
+  })
+  
+  
+  output$found_series <- renderUI({
+    req(input$confirm_finds)
+    wellPanel(
+      tags$h1("Wyszukane seriale", class = "text-center", style = "padding-top: 0; font-weight:200;"),
+      dataTableOutput("finds_tab")
+    )
+  })
+  
+  
+  
+  
+  observeEvent(input$select_buttonfounds, {
+    
+    id_odc <- dbGetQuery(con, paste0("SELECT id_odcinka FROM odcinki WHERE nr_odcinka = 1 AND nr_sezonu = 1 AND id_produkcji = "
+                                     , myValue8$id))$id_odcinka
+    
+    res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", id_odc, ", ", "'00:00:00');"))
+    dbClearResult(res)
+    showNotification("Dodano serial do oglądania!", type = "message")
+    
+  })
+  
+  
+  
+  
   #============
   
   
-
-  
- 
   
   
   
-
-    
-    
-    ###### odtworzenia ###################
-    
   
+  
+  
+  
+  
+  
+  ###### odtworzenia ###################
+  
+  
+  
+  ##Filmy
+  #----
+  myValue <- reactiveValues(id = '',
+                            title = '',
+                            moment = '')
+  
+  
+  table_buttons_film <- reactive({
     
-    ##Filmy
-    #----
-    myValue <- reactiveValues(id = '',
-                              title = '',
-                              moment = '')
+    input$select_buttonfound
+    input$addtowatch
+    input$addtowatch3
+    input$stop_moment_button
     
-    
-    table_buttons_film <- reactive({
-      
-      input$select_buttonfound
-      input$addtowatch
-      input$addtowatch3
-      input$stop_moment_button
-      
-      data = data.frame(
-        Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$tytul,
-        Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$moment_zatrzymania,
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))),
-                             'button_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
+    data = data.frame(
+      Tytuł = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$tytul,
+      Zatrzymanie = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$moment_zatrzymania,
+      Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))),
+                         'button_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
                                                      <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
                                                      <i class="far fa-comment"></i>') , 
-                           onclick = 'Shiny.onInputChange(\"select_buttonfilm\",  this.id)' ),
-        id_produkcji = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$id_p,
-        stringsAsFactors = FALSE)
-      })
-    
-    
-   
-    
-    observeEvent(input$select_buttonfilm, {
-      selectedRow <- as.numeric(strsplit(input$select_buttonfilm, "_")[[1]][2])
-      myValue$id <- table_buttons_film()[selectedRow, 4]
-      myValue$title <- table_buttons_film()[selectedRow, 1]
-      myValue$moment <- table_buttons_film()[selectedRow, 2]
-    })
+                         onclick = 'Shiny.onInputChange(\"select_buttonfilm\",  this.id)' ),
+      id_produkcji = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_f_u(", input$uzytkownik, ");"))$id_p,
+      stringsAsFactors = FALSE)
+  })
   
-    
-    
   
-    output$test <- renderText({
-      
-      
-      as.character(myValue$moment)
-      
-    })
-    
-    
-    output$watch_ui <- renderUI({
-      req(input$select_buttonfilm)
-        modalDialog(
-          
-          sliderInput("stop_moment_film", "Oglądaj dalej!",   
-                      min = as.POSIXct("2017-01-01 00:00:00"),   
-                      max = as.POSIXct(paste("2017-01-01",
-                                             dbGetQuery(con,
-                                                        paste0("SELECT dlugosc_filmu FROM produkcje WHERE id_produkcji="
-                                                               , myValue$id, ";"))$dlugosc_filmu, sep = " ")),   
-                      value = as.POSIXct(paste("2017-01-01", myValue$moment, sep = " ")),   
-                      timeFormat="%T",   
-                      step = 30, animate = T, ticks = F),
-        actionButton("stop_moment_button", "Zatwierdź czas"),
-        radioGroupButtons(
-          inputId = "ocena_odtw",
-          label = "Oceń film",
-          choices = 1:10
-        ),
-        actionButton("add_ocena_film", "Zatwierdź ocenę"),
-        textInput("odt_kom", "Skomentuj film!"),
-        actionButton("add_film_kom", "Dodaj komentarz")
-        
-                  )
-    })
-    
-    observeEvent(input$stop_moment_button, {
-      res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue$id, ", '",
-                              str_extract(input$stop_moment_film+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
-      dbClearResult(res)
-      showNotification("Miło się oglądało?", type = "message")
-    })
-    
-    
-    observeEvent(input$add_ocena_film, {
-      tryCatch({
-        res <- dbSendQuery(con, paste0("INSERT INTO oceny VALUES (", myValue$id, ", ",input$uzytkownik, ", ", input$ocena_odtw, ");"))
-        dbFetch(res)
-        
-        if(dbHasCompleted(res)){
-          showNotification("Dziękujemy za ocenę!", type = "message")
-        }
-        
-        
-        dbClearResult(res)
-      },
-      error = function(err){
-        showNotification(paste0("Oceniono już tą produkcję!"), type = 'warning')
-      })
   
-    })
+  
+  observeEvent(input$select_buttonfilm, {
+    selectedRow <- as.numeric(strsplit(input$select_buttonfilm, "_")[[1]][2])
+    myValue$id <- table_buttons_film()[selectedRow, 4]
+    myValue$title <- table_buttons_film()[selectedRow, 1]
+    myValue$moment <- table_buttons_film()[selectedRow, 2]
+  })
+  
+  
+  
+  
+  output$test <- renderText({
     
     
-    observeEvent(input$add_film_kom, {
+    as.character(myValue$moment)
+    
+  })
+  
+  
+  output$watch_ui <- renderUI({
+    req(input$select_buttonfilm)
+    modalDialog(
       
-      res <- dbSendQuery(con, paste0("SELECT skomentuj_film(NULL, '", input$odt_kom, "', ", input$uzytkownik, ", ", myValue$id, ");"))
+      sliderInput("stop_moment_film", "Oglądaj dalej!",   
+                  min = as.POSIXct("2017-01-01 00:00:00"),   
+                  max = as.POSIXct(paste("2017-01-01",
+                                         dbGetQuery(con,
+                                                    paste0("SELECT dlugosc_filmu FROM produkcje WHERE id_produkcji="
+                                                           , myValue$id, ";"))$dlugosc_filmu, sep = " ")),   
+                  value = as.POSIXct(paste("2017-01-01", myValue$moment, sep = " ")),   
+                  timeFormat="%T",   
+                  step = 30, animate = T, ticks = F),
+      actionButton("stop_moment_button", "Zatwierdź czas"),
+      radioGroupButtons(
+        inputId = "ocena_odtw",
+        label = "Oceń film",
+        choices = 1:10
+      ),
+      actionButton("add_ocena_film", "Zatwierdź ocenę"),
+      textInput("odt_kom", "Skomentuj film!"),
+      actionButton("add_film_kom", "Dodaj komentarz")
+      
+    )
+  })
+  
+  observeEvent(input$stop_moment_button, {
+    res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue$id, ", '",
+                                   str_extract(input$stop_moment_film+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
+    dbClearResult(res)
+    showNotification("Miło się oglądało?", type = "message")
+  })
+  
+  
+  observeEvent(input$add_ocena_film, {
+    tryCatch({
+      res <- dbSendQuery(con, paste0("INSERT INTO oceny VALUES (", myValue$id, ", ",input$uzytkownik, ", ", input$ocena_odtw, ");"))
       dbFetch(res)
+      
       if(dbHasCompleted(res)){
-        showNotification("Dodano komentarz!", type = "message")
+        showNotification("Dziękujemy za ocenę!", type = "message")
       }
+      
+      
       dbClearResult(res)
+    },
+    error = function(err){
+      showNotification(paste0("Oceniono już tą produkcję!"), type = 'warning')
     })
     
-     
+  })
+  
+  
+  observeEvent(input$add_film_kom, {
+    
+    res <- dbSendQuery(con, paste0("SELECT skomentuj_film(NULL, '", input$odt_kom, "', ", input$uzytkownik, ", ", myValue$id, ");"))
+    dbFetch(res)
+    if(dbHasCompleted(res)){
+      showNotification("Dodano komentarz!", type = "message")
+    }
+    dbClearResult(res)
+  })
+  
+  
   
   output$odtworzenia_filmow <- DT::renderDataTable({
-
+    
     datatable(table_buttons_film()[,-4], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
     
   })
@@ -717,8 +717,8 @@ observeEvent(input$select_buttonfounds, {
   #----
   myValue2 <- reactiveValues(id = '',
                              id_p = '',
-                            title = '',
-                            moment = '')
+                             title = '',
+                             moment = '')
   
   
   table_buttons_serial <- reactive({
@@ -742,7 +742,7 @@ observeEvent(input$select_buttonfounds, {
       id_prod = dbGetQuery(con, paste0("SELECT * FROM odtworzenia_s_u(", input$uzytkownik, ");"))$id_p,
       stringsAsFactors = FALSE)
     
-     
+    
     
   })
   
@@ -763,12 +763,12 @@ observeEvent(input$select_buttonfounds, {
     as.character(myValue2$moment)
     
   })
-
+  
   
   output$watch_ui2 <- renderUI({
     req(input$select_buttonserial)
     modalDialog(
-
+      
       sliderInput("stop_moment_serial", "Oglądaj dalej!",   
                   min = as.POSIXct("2017-01-01 00:00:00"),   
                   max = as.POSIXct(paste("2017-01-01",
@@ -795,7 +795,7 @@ observeEvent(input$select_buttonfounds, {
   
   observeEvent(input$stop_moment_button2, {
     res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", myValue2$id, ", '",
-                            str_extract(input$stop_moment_serial+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
+                                   str_extract(input$stop_moment_serial+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
     showNotification("Miło się oglądało?", type = "message")
   })
   
@@ -814,7 +814,7 @@ observeEvent(input$select_buttonfounds, {
     error = function(err){
       showNotification(paste0("Oceniono już tą produkcję!"), type = 'warning')
     })
-
+    
     
   })
   
@@ -827,20 +827,20 @@ observeEvent(input$select_buttonfounds, {
     
   })
   
-
+  
   
   output$odtworzenia_seriali <- DT::renderDataTable({
     
     #colnames(table_buttons_serial()) <- c("Tytuł", "Tytuł odcinka", "Nr odcinka", "Nr sezonu", "Zatrzymanie", "Akcje",
-                                          #"id_odcinka", "id_prod")
+    #"id_odcinka", "id_prod")
     
     datatable(table_buttons_serial()[,1:6], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
-
+    
   })
   
   ######################################################
   
-
+  
   
   
   
@@ -849,54 +849,41 @@ observeEvent(input$select_buttonfounds, {
   
   ###### topy #######################
   
-    ## top najlepiej oceniane filmy
-    #----
+  ## top najlepiej oceniane filmy
+  #----
   myValue3 <- reactiveValues(id = '',
                              title = '',
                              butt = '')
   
   
   table_buttons_topf <- reactive({
-
     
-    if(input$kat_f == 0){
+      dane <- dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f,",", input$uzytkownik , ");"))
+    
       data = data.table(
-        Tytuł = dbGetQuery(con, "SELECT * FROM top_filmow;")$Tytul,
-        Średnia = dbGetQuery(con, "SELECT * FROM top_filmow;")$'Srednia ocen',
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, "SELECT * FROM top_filmow;")),
-                           'topfbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
-                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
-                                                     <i class="far fa-comment"></i>'),
-                           onclick = 'Shiny.onInputChange(\"select_buttontopf\",  this.id)' ),
-        id_p = dbGetQuery(con, "SELECT * FROM top_filmow;")$id_p,
-        stringsAsFactors = FALSE)
-    }
-    else{
-      data = data.table(
-        Tytuł = dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))$tytul,
-        Średnia = dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))$srednia,
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))),
+        Tytuł = dane$tytul,
+        Średnia = dane$srednia,
+        Akcje = shinyInput(actionButton, nrow(dane),
                            'topfbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
                                                      <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
                                                      <i class="far fa-comment"></i>'), onclick = 'Shiny.onInputChange(\"select_buttontopf\",  this.id)' ),
-        id_p = dbGetQuery(con, paste0("SELECT * FROM top_f(", input$kat_f, ");"))$id_p,
+        id_p = dane$id_p,
         stringsAsFactors = FALSE)
-    }
   })
   
   observeEvent(input$select_buttontopf, {
     selectedRow <- as.numeric(strsplit(input$select_buttontopf, "_")[[1]][2])
     myValue3$id <- as.numeric(table_buttons_topf()[selectedRow, 4])
- 
-      
+    
+    
   })
   
-
+  
   
   output$top_filmy  <-  DT::renderDataTable({
     
-
-      datatable(table_buttons_topf()[, -4], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
+    
+    datatable(table_buttons_topf()[, -4], escape = FALSE , options = list(width = 5, searching = FALSE, lengthChange = FALSE))
   })
   
   
@@ -944,7 +931,7 @@ observeEvent(input$select_buttonfounds, {
     
   })
   
-
+  
   observeEvent(input$add_top_kom, {
     
     res <- dbSendQuery(con, paste0("SELECT skomentuj_film(NULL, '", input$top_kom, "', ", input$uzytkownik, ", ", myValue3$id, ");"))
@@ -966,33 +953,20 @@ observeEvent(input$select_buttonfounds, {
   
   table_buttons_tops <- reactive({
     
+      dane <- dbGetQuery(con, paste0("SELECT * FROM top_s(", input$kat_s,",", input$uzytkownik , ");"))
     
-    if(input$kat_s == 0){
       data = data.table(
-        Tytuł = dbGetQuery(con, "SELECT * FROM top_seriali;")$Tytul,
-        Średnia = dbGetQuery(con, "SELECT * FROM top_seriali;")$'Srednia ocen',
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, "SELECT * FROM top_seriali;")),
-                           'topsbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
-                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
-                                                     <i class="far fa-comment"></i>'),
-                           onclick = 'Shiny.onInputChange(\"select_buttontops\",  this.id)' ),
-        id_p = dbGetQuery(con, "SELECT * FROM top_seriali;")$id_p,
-        stringsAsFactors = FALSE)
-    }
-    else{
-      data = data.table(
-        Tytuł = dbGetQuery(con, paste0("SELECT * FROM top_s(", input$kat_s, ");"))$tytul,
-        Średnia = dbGetQuery(con, paste0("SELECT * FROM top_s(", input$kat_s, ");"))$srednia,
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM top_s(", input$kat_s, ");"))),
+        Tytuł = dane$tytul,
+        Średnia = dane$srednia,
+        Akcje = shinyInput(actionButton, nrow(dane),
                            'topsbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
                                                      <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
                                                      <i class="far fa-comment"></i>'), onclick = 'Shiny.onInputChange(\"select_buttontops\",  this.id)' ),
-        id_p = dbGetQuery(con, paste0("SELECT * FROM top_s(", input$kat_s, ");"))$id_p,
+        id_p = dane$id_p,
         stringsAsFactors = FALSE)
-    }
   })
-
-
+  
+  
   
   observeEvent(input$select_buttontops, {
     selectedRow <- as.numeric(strsplit(input$select_buttontops, "_")[[1]][2])
@@ -1001,7 +975,7 @@ observeEvent(input$select_buttonfounds, {
     
   })
   
-
+  
   
   output$top_seriale <-  DT::renderDataTable({
     
@@ -1020,11 +994,11 @@ observeEvent(input$select_buttonfounds, {
         choices = 1:10
       ),
       actionButton("add_ocena_top2", "Zatwierdź ocenę")
-
+      
     )
   })
   
-
+  
   
   observeEvent(input$addtowatch2, {
     
@@ -1062,7 +1036,7 @@ observeEvent(input$select_buttonfounds, {
   
   
   
-    
+  
   ## top najbardziej ogladane filmy
   #----
   
@@ -1073,29 +1047,18 @@ observeEvent(input$select_buttonfounds, {
   
   table_buttons_topof <- reactive({
     
+    dane <- dbGetQuery(con, paste0("SELECT * FROM top_o_f(", input$kat_o_f,",", input$uzytkownik , ");"))
     
-    if(input$kat_o_f == 0){
       data = data.table(
-        Tytuł = dbGetQuery(con, "SELECT * FROM top_o_filmow;")$tytul,
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, "SELECT * FROM top_o_filmow;")),
+        Tytuł =   dane$tytul,
+        Akcje = shinyInput(actionButton, nrow(dane),
                            'topofbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
                                                      <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
                                                      <i class="far fa-comment"></i>'),
                            onclick = 'Shiny.onInputChange(\"select_buttontopof\",  this.id)' ),
-        id_p = dbGetQuery(con, "SELECT * FROM top_o_filmow;")$id_p,
+        id_p =   dane$id_p,
         stringsAsFactors = FALSE)
-    }
-    else{
-      data = data.table(
-        Tytuł =   dbGetQuery(con, paste0("SELECT * FROM top_o_f(", input$kat_o_f, ");"))$tytul,
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM top_o_f(", input$kat_o_f, ");"))),
-                           'topofbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
-                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
-                                                     <i class="far fa-comment"></i>'),
-                           onclick = 'Shiny.onInputChange(\"select_buttontopof\",  this.id)' ),
-        id_p =   dbGetQuery(con, paste0("SELECT * FROM top_o_f(", input$kat_o_f, ");"))$id_p,
-        stringsAsFactors = FALSE)
-    }
+    
   })
   
   
@@ -1157,7 +1120,7 @@ observeEvent(input$select_buttonfounds, {
     error = function(err){
       showNotification(paste0("Oceniono już tą produkcję!"), type = 'warning')
     })
-
+    
     
   })
   
@@ -1171,10 +1134,10 @@ observeEvent(input$select_buttonfounds, {
   })
   
   
- #============== 
-
-
-
+  #============== 
+  
+  
+  
   
   
   
@@ -1188,29 +1151,18 @@ observeEvent(input$select_buttonfounds, {
   
   table_buttons_topos <- reactive({
     
+      dane <- dbGetQuery(con, paste0("SELECT * FROM top_o_s(", input$kat_o_s, ",", input$uzytkownik , ");"))
+      
+      data = data.table(
+        Tytuł = dane$tytul,
+        Akcje = shinyInput(actionButton, nrow(dane),
+                           'toposbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
+                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
+                                                     <i class="far fa-comment"></i>'),
+                           onclick = 'Shiny.onInputChange(\"select_buttontopos\",  this.id)' ),
+        id_p =   dane$id_p,
+        stringsAsFactors = FALSE)
     
-    if(input$kat_o_s == 0){
-      data = data.table(
-        Tytuł =   dbGetQuery(con, "SELECT * FROM top_o_seriali;")$tytul,
-        Akcje = shinyInput(actionButton, nrow(  dbGetQuery(con, "SELECT * FROM top_o_seriali;")),
-                           'toposbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
-                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
-                                                     <i class="far fa-comment"></i>'),
-                           onclick = 'Shiny.onInputChange(\"select_buttontopos\",  this.id)' ),
-        id_p = dbGetQuery(con, "SELECT * FROM top_o_seriali;")$id_p,
-        stringsAsFactors = FALSE)
-    }
-    else{
-      data = data.table(
-        Tytuł =     dbGetQuery(con, paste0("SELECT * FROM top_o_s(", input$kat_o_s, ");"))$tytul,
-        Akcje = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM top_o_s(", input$kat_o_s, ");"))),
-                           'toposbutton_', label = HTML('<i class="fas fa-caret-right"></i> &nbsp;  &nbsp;
-                                                     <i class="far fa-thumbs-up"></i>  &nbsp;  &nbsp; 
-                                                     <i class="far fa-comment"></i>'),
-                           onclick = 'Shiny.onInputChange(\"select_buttontopos\",  this.id)' ),
-        id_p =   dbGetQuery(con, paste0("SELECT * FROM top_o_s(", input$kat_o_s, ");"))$id_p,
-        stringsAsFactors = FALSE)
-    }
   })
   
   
@@ -1287,14 +1239,14 @@ observeEvent(input$select_buttonfounds, {
   
   
   
-
+  
   
   
   
   
   ## płatności
   
-    output$platnosci  <-  DT::renderDataTable({
+  output$platnosci  <-  DT::renderDataTable({
     
     platnosci <- as.data.table(dbGetQuery(con, paste0("SELECT * FROM plat_konta(", id_konta(), ");")))
     
@@ -1304,15 +1256,15 @@ observeEvent(input$select_buttonfounds, {
   })
   
   #######################################
-
-    
-    
-
-    
-    
-    
-    
-    
-    
-      
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 } 
