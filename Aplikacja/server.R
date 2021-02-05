@@ -722,8 +722,18 @@ observeEvent(input$confirm_findf, {
   
   
   observeEvent(input$stop_moment_button, {
+    
+    if(is.na(str_extract(input$stop_moment_film+3600, "([0-9]+):([0-9]+):([0-9]+)"))){
+      
+      res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue$id, ", '00:00:00');"))
+      
+    }
+    else{
+    
+    
     res <- dbSendQuery(con, paste0("SELECT odtworz_film(", input$uzytkownik, ", ", myValue$id, ", '",
                                    str_extract(input$stop_moment_film+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
+    }
     dbClearResult(res)
     showNotification("Miło się oglądało?", type = "message")
   })
