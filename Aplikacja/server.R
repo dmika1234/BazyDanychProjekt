@@ -47,7 +47,7 @@ function(input, output, session){
   
   
   uzytkownicy_konta <- reactive({
-    #a <- input$uz_add_fin
+    #input$uz_add_fin
     dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
     
     
@@ -220,7 +220,7 @@ function(input, output, session){
                                      actionButton("confirm_findf", "Szukaj"),
                                      icon = icon("search")),
                       uiOutput("found_films"),
-                      textOutput("test"),
+                      #textOutput("test"),
                   ),
                   
                   box(width = 7, 
@@ -228,7 +228,7 @@ function(input, output, session){
                                      actionButton("confirm_finds", "Szukaj"),
                                      icon = icon("search")),
                       uiOutput("found_series"),
-                      textOutput("test1"),
+                      #textOutput("test1"),
                   )),
                   
                   fluidRow(box(width = 5, 
@@ -392,7 +392,7 @@ function(input, output, session){
   
   
   ### OUTPUTY ############
-  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE))
+  output$tbl <- renderDataTable( plans_modal, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
   
   
   
@@ -453,19 +453,29 @@ function(input, output, session){
   
   found_butt <- reactive({
     
+    dane <- dbGetQuery(con, paste0("SELECT * FROM szukaj_f('", input$prod_findf, "',", input$uzytkownik, ");"))
+    
+    
     data = data.table(
-      id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$id_produkcji,
-      Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$tytul,
-      Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rezyser,
-      Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$kraj,
-      Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$dlugosc_filmu,
-      Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))$rok_produkcji,
-      Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = FALSE AND tytul = '", input$prod_findf, "';"))),
+      id_p = dane$id_p,
+      Tytuł = dane$tytul,
+      Reżyser = dane$rezyser,
+      Kraj = dane$kraj,
+      Długość = dane$dlugosc_filmu,
+      Rok = dane$rok_produkcji,
+      Oglądaj = shinyInput(actionButton, nrow(dane),
                            'ffbutton_', label = icon("plus") , 
                            onclick = 'Shiny.onInputChange(\"select_buttonfound\",  this.id)'),
       stringsAsFactors = FALSE)
+    
   })
+ 
   
+  
+  
+  
+  
+   
   
   observeEvent(input$select_buttonfound, {
     selectedRow <- as.numeric(strsplit(input$select_buttonfound, "_")[[1]][2])
@@ -477,18 +487,20 @@ function(input, output, session){
   output$findf_tab <- DT::renderDataTable({
     
     
-    datatable(found_butt()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
+    datatable(found_butt()[, -1], rownames = FALSE, escape = FALSE,
+              options = list(lengthChange = FALSE, pageLength = 5, searching = FALSE))
     
   })
   
   
+observeEvent(input$confirm_findf, {
   output$found_films <- renderUI({
-    req(input$confirm_findf)
     wellPanel(
       tags$h1("Wyszukane filmy", class = "text-center", style = "padding-top: 0; font-weight:200;"),
       dataTableOutput("findf_tab")
     )
   })
+})  
   
   
   
@@ -524,14 +536,15 @@ function(input, output, session){
   
   found_butts <- reactive({
     
+    dane <- dbGetQuery(con, paste0("SELECT * FROM szukaj_s('", input$prod_finds, "',", input$uzytkownik, ");"))
+    
     data = data.table(
-      id_p = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$id_produkcji,
-      Tytuł = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$tytul,
-      Reżyser = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rezyser,
-      Kraj = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$kraj,
-      Długość = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$dlugosc_filmu,
-      Rok = dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))$rok_produkcji,
-      Oglądaj = shinyInput(actionButton, nrow(dbGetQuery(con, paste0("SELECT * FROM produkcje WHERE czy_serial = TRUE AND tytul = '", input$prod_finds, "';"))),
+      id_p = dane$id_p,
+      Tytuł = dane$tytul,
+      Reżyser = dane$rezyser,
+      Kraj = dane$kraj,
+      Rok = dane$rok_produkcji,
+      Oglądaj = shinyInput(actionButton, nrow(dane),
                            'ssbutton_', label = icon("plus") , 
                            onclick = 'Shiny.onInputChange(\"select_buttonfounds\",  this.id)'),
       stringsAsFactors = FALSE)
@@ -548,18 +561,22 @@ function(input, output, session){
   output$finds_tab <- DT::renderDataTable({
     
     
-    datatable(found_butts()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, searching = FALSE, paging = FALSE, dom = 't'))
+    datatable(found_butts()[, -1], rownames = FALSE, escape = FALSE, options = list(lengthChange = FALSE, pageLength = 5, searching = FALSE))
     
   })
   
   
-  output$found_series <- renderUI({
-    req(input$confirm_finds)
+  
+  observeEvent(input$confirm_finds, {
+    output$found_series <- renderUI({
     wellPanel(
       tags$h1("Wyszukane seriale", class = "text-center", style = "padding-top: 0; font-weight:200;"),
       dataTableOutput("finds_tab")
     )
   })
+    
+})
+  
   
   
   
@@ -776,7 +793,7 @@ function(input, output, session){
       id_prod = dane$id_p,
       stringsAsFactors = FALSE)
     
-    #'Shiny.onInputChange(\"trigger\", Math.random());'
+    setnames(data, old = c("Tytuł_odcinka", "Nr_odcinka", "Nr_sezonu"), new = c("Tytuł odcinka", "Nr odcinka", "Nr sezonu"))
     
   })
 

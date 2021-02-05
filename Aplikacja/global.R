@@ -31,10 +31,10 @@ passwords <- us$haslo
 
 plans_modal <- as.data.table(dbGetQuery(con, "SELECT * FROM plany;"))
 
-plans_modal[, cena := paste(cena, "zl", sep = " ")]
+plans_modal[, cena := paste(cena, "zł", sep = " ")]
 setnames(plans_modal,
          old = c("nazwa_planu", "max_osob", "cena"),
-         new = c("Nazwa planu", "Maksymalna liczba uzytkownikow", "Cena"))
+         new = c("Nazwa planu", "Maksymalna liczba użytkowników", "Cena"))
 
 plans_modal <- plans_modal[, -1]
 plans <- plans_modal[, "Nazwa planu"]
