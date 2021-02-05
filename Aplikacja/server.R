@@ -881,17 +881,16 @@ observeEvent(input$confirm_findf, {
       dbFetch(res)
     if(dbHasCompleted(res)){
       showNotification("Dodano kolejny odcinek do oglądania!", type = "message")
+      dbClearResult(res)
     }
-    dbClearResult(res) 
+     
       
     }
     
     
     
   })
-    
-    
-  })
+})
  
   
   
@@ -899,8 +898,18 @@ observeEvent(input$confirm_findf, {
   
   
   observeEvent(input$stop_moment_button2, {
-    res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", myValue2$id, ", '",
+    
+    if(is.na(str_extract(input$stop_moment_serial+3600, "([0-9]+):([0-9]+):([0-9]+)"))){
+      
+      res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", myValue2$id, ", '00:00:00');"))
+        
+    }
+    else{
+      
+      res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", myValue2$id, ", '",
                                    str_extract(input$stop_moment_serial+3600, "([0-9]+):([0-9]+):([0-9]+)"), "');"))
+    }
+    
     dbFetch(res)
     if(dbHasCompleted(res)){
       showNotification("Miło się oglądało?", type = "message")
