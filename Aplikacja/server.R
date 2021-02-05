@@ -157,8 +157,8 @@ function(input, output, session){
                   menuItem("Konto", tabName="konto", icon = icon("fas fa-users")),
                   menuItem("Oglądaj dalej", tabName = "ogladanie", icon =  icon("fas fa-play")),
                   menuItem("Twoje komentarze", tabName = "komentarze", icon =  icon("fas fa-comments") ),
-                  menuItem("Top listy", tabName = "topy", icon = icon("line-chart")),
-                  menuItem("Top listy", tabName = "dashboard", icon = icon("thumbs-up"))
+                  menuItem("Top listy", tabName = "topy", icon = icon("thumbs-up")), 
+                  menuItem("Statystyki", tabName = "stats", icon = icon("line-chart"))
       )
     }
   })
@@ -331,9 +331,22 @@ function(input, output, session){
                   uiOutput("watch_ui6")
                   
                 )
-        )
+        ),
         #=========
+        
+        tabItem(tabName = "stats",
+            textInput('asd1', "asd")   
+            
+            
+                
+            
+            )
+        
+        
       )
+        
+        
+      
       
     }
     else {
