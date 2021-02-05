@@ -870,13 +870,22 @@ observeEvent(input$confirm_findf, {
   
   
   observeEvent(input$next_episode, {
-    id_o <- dbGetQuery(con, paste0("SELECT id_kolejnego_odcinka(",myValue2$id, ");"))
-    res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", id_o, ", '00:00:00');"))
-    dbFetch(res)
+    id_o <- dbGetQuery(con, paste0("SELECT id_kolejnego_odcinka(", myValue2$id, ");"))
+    
+    if(id_o == 0){
+      showNotification("Produkcja nie ma kolejnych odcinków", type = "warning")
+    }
+    else{
+      
+     res <- dbSendQuery(con, paste0("SELECT odtworz_serial(", input$uzytkownik, ", ", id_o, ", '00:00:00');"))
+      dbFetch(res)
     if(dbHasCompleted(res)){
       showNotification("Dodano kolejny odcinek do oglądania!", type = "message")
     }
-    dbClearResult(res)
+    dbClearResult(res) 
+      
+    }
+    
     
     
   })
