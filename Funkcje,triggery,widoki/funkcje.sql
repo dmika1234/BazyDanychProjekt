@@ -600,7 +600,8 @@ BEGIN
 		SELECT p.data, p.kwota 
 		FROM platnosci p 
 		WHERE p.id_konta = id_k 
-		ORDER BY p.data DESC; 
+		ORDER BY p.data DESC
+		LIMIT 10; 
 
 END; 
 $$ LANGUAGE plpgsql;  
