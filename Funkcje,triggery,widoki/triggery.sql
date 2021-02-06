@@ -303,35 +303,3 @@ CREATE TRIGGER dziecko_check BEFORE INSERT OR UPDATE ON odtworzenia FOR EACH ROW
 
 
 
-
-
-
-
---sprawdzanie zaległości w płaceniu
-
-DROP FUNCTION zaleglosci_pl;
-CREATE OR REPLACE FUNCTION zaleglosci_pl(id_k INTEGER) RETURNS DECIMAL(10,2) AS $$   
-DECLARE
-	konto RECORD;
-	zaplacone DECIMAL(10, 2);
-	do_zaplacenia DECIMAL(10,2);
-	liczba_mies INTEGER;
-BEGIN
-	SELECT * INTO konto FROM konta WHERE id_konta = id_k;
-
-	SELECT round(sum(kwota),2) INTO zaplacone 
-	FROM platnosci WHERE id_konta = id_k;
-	
-	SELECT extract(year from age(CURRENT_DATE, data_zalozenia)) * 12 +
-	extract(month from age(CURRENT_DATE, data_zalozenia)) INTO liczba_mies 
-	FROM konta WHERE id_konta = id_k;
-
-	SELECT round(liczba_mies * cena, 2)  INTO do_zaplacenia FROM plany WHERE id_planu = konto.id_planu;
-	
-	IF(do_zaplacenia > zaplacone) THEN
-		RETURN do_zaplacenia - zaplacone;	
-	ELSE
-		RETURN 0;
-	END IF;
-END;   
-$$ LANGUAGE plpgsql;  
