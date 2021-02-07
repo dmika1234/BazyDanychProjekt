@@ -195,49 +195,49 @@ function(input, output, session){
                 #----
                 column(10, align = 'center', 
                        fluidRow(
-                       box(width = 12, 
-                    tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                    radioGroupButtons(
-                      inputId = "uzytkownik",
-                      choiceNames =  uzytkownicy_konta()$nazwa,
-                      choiceValues = uzytkownicy_konta()$id_uzytkownika,
-                      size='lg',
-                      direction = "horizontal",
-                      justified = TRUE,
-                      width = '60%',
-                      individual = TRUE
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
-                    bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
-                            wellPanel(
-                              textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
-                              materialSwitch(
-                                inputId = "if_baby_add",
-                                label = "Czy użytkownik to dziecko?", 
-                                status = "primary",
-                                right = TRUE
-                              ),
-                              actionButton("uz_add_fin", "Dodaj"),
-                              actionButton("refresh_uz", "Odśwież użytkowników")
-                            )
-                    ))),
-                    
-                box(width = 6,  tags$h2(HTML(zaleglosci()), class = "text-center"),
-                        
-                        div(
-                          style = "text-align: center;", 
-                          numericInput("zaplac", tags$h3("Wpisz kwotę, którą chcesz zapłacić"), value=0, width = '100%', min=0),
-                          actionButton("potwierdz", "Potwierdź płatność", icon = icon("fas fa-dollar-sign")))
-                        
-                        
-                    ),
-                box(width = 6, 
-                             tags$h2("Ostatnie płatności", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                             dataTableOutput('platnosci')
-                             
-                              ),
+                         box(width = 12, 
+                             tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                             radioGroupButtons(
+                               inputId = "uzytkownik",
+                               choiceNames =  uzytkownicy_konta()$nazwa,
+                               choiceValues = uzytkownicy_konta()$id_uzytkownika,
+                               size='lg',
+                               direction = "horizontal",
+                               justified = TRUE,
+                               width = '60%',
+                               individual = TRUE
+                             ),
+                             div(
+                               style = "text-align: center;",
+                               actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
+                             bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
+                                     wellPanel(
+                                       textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
+                                       materialSwitch(
+                                         inputId = "if_baby_add",
+                                         label = "Czy użytkownik to dziecko?", 
+                                         status = "primary",
+                                         right = TRUE
+                                       ),
+                                       actionButton("uz_add_fin", "Dodaj"),
+                                       actionButton("refresh_uz", "Odśwież użytkowników")
+                                     )
+                             ))),
+                       
+                       box(width = 6,  tags$h2(HTML(zaleglosci()), class = "text-center"),
+                           
+                           div(
+                             style = "text-align: center;", 
+                             numericInput("zaplac", tags$h3("Wpisz kwotę, którą chcesz zapłacić"), value=0, width = '100%', min=0),
+                             actionButton("potwierdz", "Potwierdź płatność", icon = icon("fas fa-dollar-sign")))
+                           
+                           
+                       ),
+                       box(width = 6, 
+                           tags$h2("Ostatnie płatności", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                           dataTableOutput('platnosci')
+                           
+                       ),
                 )
                 
         ),
@@ -366,19 +366,36 @@ function(input, output, session){
         #=========
         
         tabItem(tabName = "stats",
-                plotOutput("pie_kraj"),
-                plotOutput("pie_kat"),
-                plotOutput("dist_ocen")
+                fluidPage(
+                  
+                  tags$h2("Chcesz się dowiedzieć czegoś o naszej platformie?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                  br(),
+                  fluidRow(
+                    box(width = 6,
+                        tags$h4("Skąd pochodzą dostępne u nas produkcje?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                        plotOutput("pie_kraj")
+                        ),
+                    box(width = 6,
+                        tags$h4("Jakich kategorii produkcji mamy najwięcej?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                        plotOutput("pie_kat")
+                      
+                        )
+                  ),
+                  fluidRow(column(width = 12, align = 'center',
+                  box(width = 2, background = NULL),                                      
+                  box(width = 8,
+                      tags$h2("Jak użytkownicy oceniają produkcje?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                      plotOutput("dist_ocen")
+                      ))
+                  ))
+             
                 
-                
-                
-                
-        )
+          )
         
         
       )
       
-      
+   
       
       
     }
@@ -433,7 +450,7 @@ function(input, output, session){
   #=======  
   
   
-
+  
   
   
   
@@ -1446,15 +1463,15 @@ function(input, output, session){
   
   observeEvent(input$potwierdz, {
     tryCatch({
-    res <- dbSendQuery(con, paste0("SELECT zaplac(", id_konta(), ", ", input$zaplac, ");"))
-    
-    dbFetch(res)
-    
-    if(dbHasCompleted(res)){
-      showNotification("Płatność zaksięgowana", type = "message")
-    }
-    
-    dbClearResult(res)
+      res <- dbSendQuery(con, paste0("SELECT zaplac(", id_konta(), ", ", input$zaplac, ");"))
+      
+      dbFetch(res)
+      
+      if(dbHasCompleted(res)){
+        showNotification("Płatność zaksięgowana", type = "message")
+      }
+      
+      dbClearResult(res)
     },
     error = function(err){
       showNotification(paste0("Ups, coś poszło nie tak"), type = 'warning')
@@ -1493,47 +1510,47 @@ function(input, output, session){
   #######################################
   
   
-
   
-#Wykresy do statystyk  
-#----  
+  
+  #Wykresy do statystyk  
+  #----  
   ##
-output$pie_kraj <- renderPlot({
+  output$pie_kraj <- renderPlot({
+    
+    produkcje <- as.data.table(dbGetQuery(con, "SELECT * FROM produkcje;"))
+    kraje_il <- produkcje[, .N, by = kraj]
+    best <- kraje_il[order(N, decreasing = TRUE)[1:5], kraj]
+    kraje_il[!(kraj %in% best), kraj := "inne"]
+    kraje_il <- kraje_il[, sum(N), by = kraj]
+    
+    
+    kraje_il <- kraje_il %>% 
+      arrange(desc(kraj)) %>%
+      mutate(prop = V1 / sum(kraje_il$V1) *100) %>%
+      mutate(ypos = cumsum(prop)- 0.5*prop )
+    
+    x <- kraje_il[, prop]
+    
+    y <- floor(x)
+    
+    ile <- 100 - sum(y)
+    
+    which_add_vec <- head(order(x-y, decreasing = TRUE), ile)
+    
+    y[which_add_vec] <- y[which_add_vec] +1
+    
+    
+    ggplot(kraje_il, aes(x = "", y = prop, fill = kraj)) +
+      geom_bar(stat = "identity", width = 1) +
+      coord_polar("y", start = 0) +
+      theme_void() +
+      geom_text(aes(y = ypos, label = paste(y, "%")), color = "white", size=6) +
+      scale_fill_manual(values=c("#55DDE0", "#999999", "#2F4858", "#F6AE2D", "#F26419", "#33658A")) +
+      labs(fill = "Kraj")
+    
+  })  
   
-  produkcje <- as.data.table(dbGetQuery(con, "SELECT * FROM produkcje;"))
-  kraje_il <- produkcje[, .N, by = kraj]
-  best <- kraje_il[order(N, decreasing = TRUE)[1:5], kraj]
-  kraje_il[!(kraj %in% best), kraj := "inne"]
-  kraje_il <- kraje_il[, sum(N), by = kraj]
-  
-  
-  kraje_il <- kraje_il %>% 
-    arrange(desc(kraj)) %>%
-    mutate(prop = V1 / sum(kraje_il$V1) *100) %>%
-    mutate(ypos = cumsum(prop)- 0.5*prop )
-  
-  x <- kraje_il[, prop]
-  
-  y <- floor(x)
-  
-  ile <- 100 - sum(y)
-  
-  which_add_vec <- head(order(x-y, decreasing = TRUE), ile)
-  
-  y[which_add_vec] <- y[which_add_vec] +1
-  
-
-  ggplot(kraje_il, aes(x = "", y = prop, fill = kraj)) +
-    geom_bar(stat = "identity", width = 1) +
-    coord_polar("y", start = 0) +
-    theme_void() +
-    geom_text(aes(y = ypos, label = paste(y, "%")), color = "white", size=6) +
-    scale_fill_manual(values=c("#55DDE0", "#999999", "#2F4858", "#F6AE2D", "#F26419", "#33658A")) +
-    labs(fill = "Kraj")
-
-})  
-  
-##
+  ##
   
   
   output$dist_ocen <- renderPlot({
@@ -1547,48 +1564,48 @@ output$pie_kraj <- renderPlot({
                          labels = 1:10)
     
   })
-
+  
   ##
   
-output$pie_kat <- renderPlot({
+  output$pie_kat <- renderPlot({
+    
+    produkcje_kat <- as.data.table(dbGetQuery(con, "SELECT * FROM produkcje_with_kat;"))
+    setnames(produkcje_kat, old = c('nazwa_kategorii'), new = c("nazwa"))
+    
+    kat_il <- produkcje_kat[, .N, by = nazwa]
+    kat_il <- kat_il[order(N, decreasing = TRUE)[1:5]]
+    
+    
+    kat_il <- kat_il %>% 
+      arrange(desc(nazwa)) %>%
+      mutate(prop = N / sum(kat_il$N) *100) %>%
+      mutate(ypos = cumsum(prop)- 0.5*prop )
+    
+    x <- kat_il[, prop]
+    
+    y <- floor(x)
+    
+    ile <- 100 - sum(y)
+    
+    which_add_vec <- head(order(x-y, decreasing = TRUE), ile)
+    
+    y[which_add_vec] <- y[which_add_vec] +1
+    
+    
+    
+    # piechart
+    ggplot(kat_il, aes(x = "", y = prop, fill = nazwa)) +
+      geom_bar(stat = "identity", width = 1) +
+      coord_polar("y", start = 0) +
+      theme_void() +
+      geom_text(aes(y = ypos, label = paste(y, "%")), color = "white", size=6) +
+      scale_fill_manual(values=c("#55DDE0", "#999999", "#2F4858", "#F6AE2D", "#F26419")) +
+      labs(fill = "Nazwa kategorii")
+    
+  })  
   
-  produkcje_kat <- as.data.table(dbGetQuery(con, "SELECT * FROM produkcje_with_kat;"))
-  setnames(produkcje_kat, old = c('nazwa_kategorii'), new = c("nazwa"))
   
-  kat_il <- produkcje_kat[, .N, by = nazwa]
-  kat_il <- kat_il[order(N, decreasing = TRUE)[1:5]]
-  
-  
-  kat_il <- kat_il %>% 
-    arrange(desc(nazwa)) %>%
-    mutate(prop = N / sum(kat_il$N) *100) %>%
-    mutate(ypos = cumsum(prop)- 0.5*prop )
-  
-  x <- kat_il[, prop]
-  
-  y <- floor(x)
-  
-  ile <- 100 - sum(y)
-  
-  which_add_vec <- head(order(x-y, decreasing = TRUE), ile)
-  
-  y[which_add_vec] <- y[which_add_vec] +1
-  
-  
-  
-  # piechart
-  ggplot(kat_il, aes(x = "", y = prop, fill = nazwa)) +
-    geom_bar(stat = "identity", width = 1) +
-    coord_polar("y", start = 0) +
-    theme_void() +
-    geom_text(aes(y = ypos, label = paste(y, "%")), color = "white", size=6) +
-    scale_fill_manual(values=c("#55DDE0", "#999999", "#2F4858", "#F6AE2D", "#F26419")) +
-    labs(fill = "Nazwa kategorii")
-
-})  
-
-  
-#==============================  
+  #==============================  
   
   
   
