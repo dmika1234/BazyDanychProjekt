@@ -33,5 +33,15 @@ FROM komentarze k
 ----
 
 
+--produkcje z kategoriami--
+CREATE VIEW produkcje_with_kat AS
+SELECT p.tytul, k.nazwa_kategorii
+FROM produkcje p
+	JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji
+	JOIN kategorie k ON k.id_kategorii = w.id_kategorii;
+
+
+----
+
 
 

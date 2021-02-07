@@ -2,15 +2,17 @@ library(DT)
 library(shinyjs)
 library(sodium)
 library(data.table)
+library(ggplot2)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 require("RPostgres")
+library(dplyr)
 require(data.table)
 library("dashboardthemes")
 library("shinyBS")
-
-
+library(lubridate)
+library(stringr)
 
 function(input, output, session){
   
@@ -364,7 +366,9 @@ function(input, output, session){
         #=========
         
         tabItem(tabName = "stats",
-                textInput('asd1', "asd")   
+                plotOutput("pie_kraj"),
+                plotOutput("pie_kat"),
+                plotOutput("dist_ocen")
                 
                 
                 
@@ -1489,7 +1493,102 @@ function(input, output, session){
   #######################################
   
   
+
   
+#Wykresy do statystyk  
+#----  
+  ##
+output$pie_kraj <- renderPlot({
+  
+  produkcje <- as.data.table(dbGetQuery(con, "SELECT * FROM produkcje;"))
+  kraje_il <- produkcje[, .N, by = kraj]
+  best <- kraje_il[order(N, decreasing = TRUE)[1:5], kraj]
+  kraje_il[!(kraj %in% best), kraj := "inne"]
+  kraje_il <- kraje_il[, sum(N), by = kraj]
+  
+  
+  kraje_il <- kraje_il %>% 
+    arrange(desc(kraj)) %>%
+    mutate(prop = V1 / sum(kraje_il$V1) *100) %>%
+    mutate(ypos = cumsum(prop)- 0.5*prop )
+  
+  x <- kraje_il[, prop]
+  
+  y <- floor(x)
+  
+  ile <- 100 - sum(y)
+  
+  which_add_vec <- head(order(x-y, decreasing = TRUE), ile)
+  
+  y[which_add_vec] <- y[which_add_vec] +1
+  
+
+  ggplot(kraje_il, aes(x = "", y = prop, fill = kraj)) +
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar("y", start = 0) +
+    theme_void() +
+    geom_text(aes(y = ypos, label = paste(y, "%")), color = "white", size=6) +
+    scale_fill_manual(values=c("#55DDE0", "#999999", "#2F4858", "#F6AE2D", "#F26419", "#33658A")) +
+    labs(fill = "Kraj")
+
+})  
+  
+##
+  
+  
+  output$dist_ocen <- renderPlot({
+    
+    ocenki <- as.data.table(dbGetQuery(con, "SELECT ocena FROM oceny;"))
+    ggplot(ocenki) +
+      geom_histogram(aes(x = ocena), binwidth = 1, color = "pink", fill =  "#33658A") +
+      theme_classic() +
+      labs(x = "Ocena", y = "Ilość występowania") +
+      scale_x_continuous(limits = c(0, 11), breaks = 1:10,
+                         labels = 1:10)
+    
+  })
+
+  ##
+  
+output$pie_kat <- renderPlot({
+  
+  produkcje_kat <- as.data.table(dbGetQuery(con, "SELECT * FROM produkcje_with_kat;"))
+  setnames(produkcje_kat, old = c('nazwa_kategorii'), new = c("nazwa"))
+  
+  kat_il <- produkcje_kat[, .N, by = nazwa]
+  kat_il <- kat_il[order(N, decreasing = TRUE)[1:5]]
+  
+  
+  kat_il <- kat_il %>% 
+    arrange(desc(nazwa)) %>%
+    mutate(prop = N / sum(kat_il$N) *100) %>%
+    mutate(ypos = cumsum(prop)- 0.5*prop )
+  
+  x <- kat_il[, prop]
+  
+  y <- floor(x)
+  
+  ile <- 100 - sum(y)
+  
+  which_add_vec <- head(order(x-y, decreasing = TRUE), ile)
+  
+  y[which_add_vec] <- y[which_add_vec] +1
+  
+  
+  
+  # piechart
+  ggplot(kat_il, aes(x = "", y = prop, fill = nazwa)) +
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar("y", start = 0) +
+    theme_void() +
+    geom_text(aes(y = ypos, label = paste(y, "%")), color = "white", size=6) +
+    scale_fill_manual(values=c("#55DDE0", "#999999", "#2F4858", "#F6AE2D", "#F26419")) +
+    labs(fill = "Nazwa kategorii")
+
+})  
+
+  
+#==============================  
   
   
   
