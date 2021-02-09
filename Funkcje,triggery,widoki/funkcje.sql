@@ -781,3 +781,146 @@ BEGIN
 END;   
 $$ LANGUAGE plpgsql;  
 
+
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+			       
+-------- funkcja wypisująca komentarze danego użytkownika i wszystkie na nie odpowiadające
+
+CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) RETURNS TABLE(id_k TEXT, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, faza INTEGER) AS $$
+BEGIN
+	RETURN QUERY 
+		WITH RECURSIVE kom_re AS (
+			SELECT
+				k.tresc AS t,
+				k.id_komentarza,
+				k.id_produkcji,
+				k.id_odcinka,
+				0 as id_pop,
+				0 as phase,
+				k.data,
+				TEXT(k.id_komentarza) AS id_klejone_kom
+			FROM komentarze k
+				WHERE k.id_uzytkownika = id
+				
+			UNION
+			
+			SELECT
+				k1.tresc AS t,
+				k1.id_komentarza,
+				k1.id_produkcji,
+				k1.id_odcinka,
+				k1.id_pop_kom as id_pop,
+				k2.phase + 1 as phase,
+				k1.data,
+				k2.id_klejone_kom  || '|' || k1.id_komentarza 
+			FROM komentarze k1
+				INNER JOIN kom_re k2
+			ON k1.id_pop_kom = k2.id_komentarza
+		)
+
+
+		SELECT id_klejone_kom, t, data, id_produkcji, id_odcinka, phase
+		FROM kom_re
+		ORDER BY id_klejone_kom;
+END;
+$$ LANGUAGE plpgsql;
+
+--funkcja wypisująca komentarze do produkcji
+
+CREATE OR REPLACE FUNCTION kom_p(id_p INTEGER) RETURNS TABLE(id_k TEXT, id_uz INTEGER, tr TEXT, data_kom DATE, faza INTEGER) AS $$
+BEGIN
+	RETURN QUERY 
+		WITH RECURSIVE kom_re AS (
+			SELECT
+				k.tresc AS t,
+				k.id_komentarza,
+				k.id_uzytkownika,
+				0 as id_pop,
+				0 as phase,
+				k.data,
+				TEXT(k.id_komentarza) AS id_klejone_kom
+			FROM komentarze k
+				WHERE k.id_produkcji = id_p
+				
+			UNION
+			
+			SELECT
+				k1.tresc AS t,
+				k1.id_komentarza,
+				k1.id_uzytkownika,
+				k1.id_pop_kom as id_pop,
+				k2.phase + 1 as phase,
+				k1.data,
+				k2.id_klejone_kom  || '|' || k1.id_komentarza 
+			FROM komentarze k1
+				INNER JOIN kom_re k2
+			ON k1.id_pop_kom = k2.id_komentarza
+		)
+
+
+		SELECT id_klejone_kom, id_uzytkownika, t, data, phase
+		FROM kom_re
+		ORDER BY id_klejone_kom;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+--funkcja wypisująca komentarze do odcinków
+
+CREATE OR REPLACE FUNCTION kom_o(id_o INTEGER) RETURNS TABLE(id_k TEXT, id_uz INTEGER, tr TEXT, data_kom DATE, faza INTEGER) AS $$
+BEGIN
+	RETURN QUERY 
+		WITH RECURSIVE kom_re AS (
+			SELECT
+				k.tresc AS t,
+				k.id_komentarza,
+				k.id_uzytkownika,
+				0 as id_pop,
+				0 as phase,
+				k.data,
+				TEXT(k.id_komentarza) AS id_klejone_kom
+			FROM komentarze k
+				WHERE k.id_odcinka = id_o
+				
+			UNION
+			
+			SELECT
+				k1.tresc AS t,
+				k1.id_komentarza,
+				k1.id_uzytkownika,
+				k1.id_pop_kom as id_pop,
+				k2.phase + 1 as phase,
+				k1.data,
+				k2.id_klejone_kom  || '|' || k1.id_komentarza 
+			FROM komentarze k1
+				INNER JOIN kom_re k2
+			ON k1.id_pop_kom = k2.id_komentarza
+		)
+
+
+		SELECT id_klejone_kom, id_uzytkownika, t, data, phase
+		FROM kom_re
+		ORDER BY id_klejone_kom;
+END;
+$$ LANGUAGE plpgsql;
+
+			       
