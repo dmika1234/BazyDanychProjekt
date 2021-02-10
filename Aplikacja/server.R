@@ -289,6 +289,21 @@ function(input, output, session){
         
         tabItem(tabName ="komentarze", 
                 #----
+              fluidRow(
+                box(width = 12,
+                    tags$h1("Komentarze do wyszukanej produkcji"),
+                    dropdownButton(textInput("prod_kom_fp", "Wyszukaj komentarze z filmu", placeholder = "Tytuł"),
+                                   actionButton("confirm_kom_fp", "Szukaj"),
+                                   icon = icon("search")),
+                    htmlOutput('komp'),
+                    uiOutput('kom_to_p')
+                    )
+                
+                
+              )
+                
+                
+                
         ),
         #================
         
@@ -368,6 +383,7 @@ function(input, output, session){
         #=========
         
         tabItem(tabName = "stats",
+                #----
                 fluidPage(
                   
                   tags$h2("Chcesz się dowiedzieć czegoś o naszej platformie?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
@@ -1015,6 +1031,116 @@ function(input, output, session){
   
   
   
+  ####################KOmentarze###################################################
+  #----
+  
+  
+  kom_p_id <- reactive({
+    
+    input$confirm_kom_fp
+    input$tr_kom_to_p_ac
+    
+    id_p <- dbGetQuery(con, paste0("SELECT id_produkcji FROM produkcje WHERE tytul='", input$prod_kom_fp, "' LIMIT 1;"))$id_produkcji
+    
+  })
+  
+  
+  prod_koms <- reactive({
+    
+    input$confirm_kom_fp
+    input$tr_kom_to_p_ac
+
+    as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_p(", kom_p_id(), ");")))
+    
+    
+  })
+  
+  
+  output$komp <- renderUI({
+    req(input$confirm_kom_fp)
+
+    faza <- prod_koms()$faza
+    a <- 1:nrow(prod_koms())
+    
+    for(i in 1:nrow(prod_koms())){
+      
+      if(i != 1)
+        last_margin <- 30*faza[i-1]
+      else
+        last_margin <- 0 
+      
+      a[i] <- paste0("<div style = margin-left:", 30*faza[i]-last_margin, "px>", prod_koms()[i, nazwa_uz], " napisał: ", prod_koms()[i, tr])
+      
+      
+    }
+    
+    a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
+                              onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/>")
+    
+    HTML(a)
+    
+  })
+  
+  
+  value_kp <- reactiveValues(id_k = '')
+  
+  
+  observeEvent(input$select_buttonkp, {
+    selectedRow <- as.numeric(strsplit(input$select_buttonkp, "_")[[1]][2])
+    value_kp$id_k <- prod_koms()[selectedRow, id_k]
+
+  })
+  
+  
+  observeEvent(input$select_buttonkp, ignoreInit = TRUE, {
+    
+    output$kom_to_p <- renderUI({
+      
+      showModal(
+        
+        modalDialog(
+          
+          
+          textInput("tr_kom_to_p", "Wprowadź treść komentarza"),
+          actionButton("tr_kom_to_p_ac", "Zatwierdź")
+
+        )
+        
+        
+      )
+
+      
+    })
+  
+  })
+  
+  observeEvent(input$tr_kom_to_p_ac, {
+    
+
+    tryCatch({
+      res <- dbSendQuery(con, paste0("SELECT skomentuj_film(", value_kp$id_k, ", '", input$tr_kom_to_p, "', ", input$uzytkownik, ", ", kom_p_id(), ");"))
+      dbFetch(res)
+      
+      if(dbHasCompleted(res)){
+        showNotification("Dodano komentarz!", type = "message")
+      }
+      
+      
+      dbClearResult(res)
+    },
+    error = function(err){
+      showNotification(paste0("Ups, coś poszło nie tak..."), type = 'warning')
+    })
+    
+    
+  })
+  
+  
+  
+
+  
+  
+  ######################################################
   
   
   
@@ -1463,6 +1589,15 @@ function(input, output, session){
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  ## płatności
+  #----
   observeEvent(input$potwierdz, {
     tryCatch({
       res <- dbSendQuery(con, paste0("SELECT zaplac(", id_konta(), ", ", input$zaplac, ");"))
@@ -1485,10 +1620,6 @@ function(input, output, session){
   
   
   
-  
-  
-  
-  ## płatności
   
   platnosci <- reactive({
     

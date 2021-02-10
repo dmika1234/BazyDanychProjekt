@@ -1,19 +1,27 @@
-# library(DT)
-# library(shinyjs)
-# library(sodium)
-# library(data.table)
-# library(ggplot2)
-# library(shiny)
-# library(shinydashboard)
-# library(shinyWidgets)
-# require("RPostgres")
-# library(dplyr)
-# require(data.table)
-# library("dashboardthemes")
-# library("shinyBS")
-# library(lubridate)
-# library(stringr)
+library(DT)
+library(shinyjs)
+library(sodium)
+library(data.table)
+library(ggplot2)
+library(shiny)
+library(shinydashboard)
+library(shinyWidgets)
+require("RPostgres")
+library(dplyr)
+require(data.table)
+library("dashboardthemes")
+library("shinyBS")
+library(lubridate)
+library(stringr)
+library(glue)
+
 source("C:/Users/dmika/OneDrive/Dokumenty/login_credentials.R")
+
+
+
+
+
+
 
 
 #Zmienne Globalne==============================================================================================================================

@@ -1,15 +1,27 @@
-# library(DT)
-# library(shinyjs)
-# library(sodium)
-# library(data.table)
-# library(shiny)
-# library(shinydashboard)
-# library(shinyWidgets)
-# require("RPostgres")
-# require(data.table)
-# library("dashboardthemes")
-# library("shinyBS")
-#
+library(DT)
+library(shinyjs)
+library(sodium)
+library(data.table)
+library(ggplot2)
+library(shiny)
+library(shinydashboard)
+library(shinyWidgets)
+require("RPostgres")
+library(dplyr)
+require(data.table)
+library("dashboardthemes")
+library("shinyBS")
+library(lubridate)
+library(stringr)
+library(glue)
+
+
+
+
+
+
+
+
 
 tags$style("@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);")
 
