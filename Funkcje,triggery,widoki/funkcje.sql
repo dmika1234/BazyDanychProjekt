@@ -804,7 +804,7 @@ $$ LANGUAGE plpgsql;
 			       
 -------- funkcja wypisująca komentarze danego użytkownika i wszystkie na nie odpowiadające
 
-CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) RETURNS TABLE(id_k TEXT, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, faza INTEGER) AS $$
+CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) RETURNS TABLE(id_k TEXT, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), faza INTEGER) AS $$
 BEGIN
 	RETURN QUERY 
 		WITH RECURSIVE kom_re AS (
@@ -837,8 +837,10 @@ BEGIN
 		)
 
 
-		SELECT id_klejone_kom, t, data, id_produkcji, id_odcinka, phase
-		FROM kom_re
+		SELECT k.id_klejone_kom, k.t, k.data, k.id_produkcji, k.id_odcinka, p.tytul, o.tytul_odcinka,  k.phase
+		FROM kom_re k
+		JOIN produkcje p ON p.id_produkcji = k.id_produkcji
+		LEFT JOIN odcinki o ON o.id_odcinka = k.id_odcinka
 		ORDER BY id_klejone_kom;
 END;
 $$ LANGUAGE plpgsql;
