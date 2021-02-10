@@ -1058,6 +1058,24 @@ function(input, output, session){
   
   output$komp <- renderUI({
     req(input$confirm_kom_fp)
+    
+    if(length(kom_p_id()) == 0){
+      
+      showNotification("Nie posiadamy produkcji o takim tytule!", type = "warning")
+    }
+    else{
+      
+    
+    
+    
+    if(nrow(prod_koms()) == 0){
+      showNotification("Ta produkcja nie posiada komentarzy!", type = "warning")
+    }
+    else{
+      
+      
+      
+    
 
     faza <- prod_koms()$faza
     a <- 1:nrow(prod_koms())
@@ -1077,7 +1095,11 @@ function(input, output, session){
     a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
                               onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/>")
     
-    HTML(a)
+    return(HTML(a))
+    
+    
+    }
+    }
     
   })
   
