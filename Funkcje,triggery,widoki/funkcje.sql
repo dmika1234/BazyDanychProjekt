@@ -892,7 +892,7 @@ $$ LANGUAGE plpgsql;
 
 --funkcja wypisująca komentarze do odcinków
 
-CREATE OR REPLACE FUNCTION kom_o(id_o INTEGER) RETURNS TABLE(id_k TEXT, id_uz INTEGER, tr TEXT, data_kom DATE, faza INTEGER) AS $$
+CREATE OR REPLACE FUNCTION kom_o(id_o INTEGER) RETURNS TABLE(id_k INTEGER, id_uz INTEGER, nazwa_uz VARCHAR(255), tr TEXT, data_kom DATE, faza INTEGER) AS $$
 BEGIN
 	RETURN QUERY 
 		WITH RECURSIVE kom_re AS (
@@ -923,10 +923,10 @@ BEGIN
 		)
 
 
-		SELECT id_klejone_kom, id_uzytkownika, t, data, phase
-		FROM kom_re
+		SELECT k.id_komentarza, k.id_uzytkownika, u.nazwa, k.t, k.data, k.phase
+		FROM kom_re k
+		JOIN uzytkownicy u ON u.id_uzytkownika = k.id_uzytkownika
 		ORDER BY id_klejone_kom;
 END;
 $$ LANGUAGE plpgsql;
-
 			       
