@@ -1,18 +1,18 @@
-library(DT)
-library(shinyjs)
-library(sodium)
-library(data.table)
-library(ggplot2)
-library(shiny)
-library(shinydashboard)
-library(shinyWidgets)
-require("RPostgres")
-library(dplyr)
-require(data.table)
-library("dashboardthemes")
-library("shinyBS")
-library(lubridate)
-library(stringr)
+# library(DT)
+# library(shinyjs)
+# library(sodium)
+# library(data.table)
+# library(ggplot2)
+# library(shiny)
+# library(shinydashboard)
+# library(shinyWidgets)
+# require("RPostgres")
+# library(dplyr)
+# require(data.table)
+# library("dashboardthemes")
+# library("shinyBS")
+# library(lubridate)
+# library(stringr)
 source("C:/Users/dmika/OneDrive/Dokumenty/login_credentials.R")
 
 
@@ -70,8 +70,8 @@ loginpage <- tags$div(id = "loginpage", style = "width: 500px; max-width: 100%; 
                         #LogowanieUI==
                         wellPanel(
                           tags$h2("Logowanie", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                          textInput("userName", placeholder="E-mail", label = tagList(icon("user"), "E-mail")),
-                          passwordInput("passwd", placeholder="Hasło", label = tagList(icon("unlock-alt"), "Hasło")),
+                          textInput("userName", placeholder="E-mail", value = "realizesairplane3@o2.pl",  label = tagList(icon("user"), "E-mail")),
+                          passwordInput("passwd", placeholder="Hasło",  value = "tNlD37R1iTz58xR3", label = tagList(icon("unlock-alt"), "Hasło")),
                           br(),
                           div(
                             style = "text-align: center;",
