@@ -845,7 +845,7 @@ $$ LANGUAGE plpgsql;
 
 --funkcja wypisująca komentarze do produkcji
 
-CREATE OR REPLACE FUNCTION kom_p(id_p INTEGER) RETURNS TABLE(id_k TEXT, id_uz INTEGER, tr TEXT, data_kom DATE, faza INTEGER) AS $$
+CREATE OR REPLACE FUNCTION kom_p(id_p INTEGER) RETURNS TABLE(id_k INTEGER, id_uz INTEGER, nazwa_uz VARCHAR(255), tr TEXT, data_kom DATE, faza INTEGER) AS $$
 BEGIN
 	RETURN QUERY 
 		WITH RECURSIVE kom_re AS (
@@ -856,7 +856,9 @@ BEGIN
 				0 as id_pop,
 				0 as phase,
 				k.data,
-				TEXT(k.id_komentarza) AS id_klejone_kom
+				TEXT(k.id_komentarza) AS id_klejone_kom,
+				k.id_produkcji,
+				k.id_odcinka
 			FROM komentarze k
 				WHERE k.id_produkcji = id_p
 				
@@ -869,19 +871,21 @@ BEGIN
 				k1.id_pop_kom as id_pop,
 				k2.phase + 1 as phase,
 				k1.data,
-				k2.id_klejone_kom  || '|' || k1.id_komentarza 
+				k2.id_klejone_kom  || '|' || k1.id_komentarza,
+				k1.id_produkcji,
+				k1.id_odcinka
 			FROM komentarze k1
 				INNER JOIN kom_re k2
 			ON k1.id_pop_kom = k2.id_komentarza
 		)
 
 
-		SELECT id_klejone_kom, id_uzytkownika, t, data, phase
-		FROM kom_re
+		SELECT k.id_komentarza, k.id_uzytkownika, u.nazwa, k.t, k.data,k.phase
+		FROM kom_re k
+		JOIN uzytkownicy u ON u.id_uzytkownika = k.id_uzytkownika
 		ORDER BY id_klejone_kom;
 END;
 $$ LANGUAGE plpgsql;
-
 
 
 --funkcja wypisująca komentarze do odcinków
