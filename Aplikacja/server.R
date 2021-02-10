@@ -289,20 +289,27 @@ function(input, output, session){
         
         tabItem(tabName ="komentarze", 
                 #----
-              fluidRow(
-                box(width = 12,
-                    tags$h1("Komentarze do wyszukanej produkcji"),
-                    dropdownButton(textInput("prod_kom_fp", "Wyszukaj komentarze z filmu", placeholder = "Tytuł"),
-                                   actionButton("confirm_kom_fp", "Szukaj"),
-                                   icon = icon("search")),
-                    htmlOutput('komp'),
-                    uiOutput('kom_to_p')
-                    )
-                
-                
-              )
-                
-                
+                fluidRow(
+                  box(width = 10,
+                      tags$h1("Wyszukaj komentarze do danej produkcji", class = "text-center"),
+                      br(),
+                      dropdownButton(textInput("prod_kom_fp", "Wyszukaj komentarze do produkcji", placeholder = "Tytuł"),
+                                     actionButton("confirm_kom_fp", "Szukaj"),
+                                     icon = icon("search")),
+                      tags$h2(textOutput("tyt_f_kom"), class = "text-center", style = "padding-top: 0; font-weight:600;",
+                              ),
+                      br(),
+                      htmlOutput('komp'),
+                      uiOutput('kom_to_p')
+                  ),
+                  box(width=10,
+                      tags$h1("Twoje komentarze", class = "text-center"),
+                      br(),
+                      htmlOutput('komu')
+                  )
+                  
+                )
+              
                 
         ),
         #================
@@ -392,28 +399,28 @@ function(input, output, session){
                     box(width = 6,
                         tags$h4("Skąd pochodzą dostępne u nas produkcje?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                         plotOutput("pie_kraj")
-                        ),
+                    ),
                     box(width = 6,
                         tags$h4("Jakich kategorii produkcji mamy najwięcej?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
                         plotOutput("pie_kat")
-                      
-                        )
+                        
+                    )
                   ),
                   fluidRow(column(width = 12, align = 'center',
-                  box(width = 2, background = NULL),                                      
-                  box(width = 8,
-                      tags$h2("Jak użytkownicy oceniają produkcje?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                      plotOutput("dist_ocen")
-                      ))
+                                  box(width = 2, background = NULL),                                      
+                                  box(width = 8,
+                                      tags$h2("Jak użytkownicy oceniają produkcje?", class = "text-center", style = "padding-top: 0; font-weight:600;"),
+                                      plotOutput("dist_ocen")
+                                  ))
                   ))
-             
                 
-          )
+                
+        )
         
         
       )
       
-   
+      
       
       
     }
@@ -1044,12 +1051,18 @@ function(input, output, session){
     
   })
   
+  output$tyt_f_kom <- renderText({
+    
+    input$prod_kom_fp
+    
+  })
+  
   
   prod_koms <- reactive({
     
     input$confirm_kom_fp
     input$tr_kom_to_p_ac
-
+    
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_p(", kom_p_id(), ");")))
     
     
@@ -1065,40 +1078,41 @@ function(input, output, session){
     }
     else{
       
-    
-    
-    
-    if(nrow(prod_koms()) == 0){
-      showNotification("Ta produkcja nie posiada komentarzy!", type = "warning")
-    }
-    else{
       
       
       
-    
-
-    faza <- prod_koms()$faza
-    a <- 1:nrow(prod_koms())
-    
-    for(i in 1:nrow(prod_koms())){
-      
-      if(i != 1)
-        last_margin <- 30*faza[i-1]
-      else
-        last_margin <- 0 
-      
-      a[i] <- paste0("<div style = margin-left:", 30*faza[i]-last_margin, "px>", prod_koms()[i, nazwa_uz], " napisał: ", prod_koms()[i, tr])
-      
-      
-    }
-    
-    a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
-                              onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/>")
-    
-    return(HTML(a))
-    
-    
-    }
+      if(nrow(prod_koms()) == 0){
+        showNotification("Ta produkcja nie posiada komentarzy!", type = "warning")
+      }
+      else{
+        
+        
+        
+        
+        
+        faza <- prod_koms()$faza
+        a <- 1:nrow(prod_koms())
+        
+        
+        for(i in 1:nrow(prod_koms())){
+          
+          # if(i != 1)
+          #   last_margin <- 30*faza[i-1]
+          # else
+          #   last_margin <- 0 
+          
+          a[i] <- paste0("<div style = margin-left:", 10+30*faza[i], "px><span style=\"color:#FF337A\">", prod_koms()[i, nazwa_uz], " napisał: </span>", prod_koms()[i, tr])
+          
+          
+        }
+        
+        a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
+                                                          onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/></div>")
+        
+        return(HTML(a))
+        
+        
+      }
     }
     
   })
@@ -1110,7 +1124,7 @@ function(input, output, session){
   observeEvent(input$select_buttonkp, {
     selectedRow <- as.numeric(strsplit(input$select_buttonkp, "_")[[1]][2])
     value_kp$id_k <- prod_koms()[selectedRow, id_k]
-
+    
   })
   
   
@@ -1125,20 +1139,20 @@ function(input, output, session){
           
           textInput("tr_kom_to_p", "Wprowadź treść komentarza"),
           actionButton("tr_kom_to_p_ac", "Zatwierdź")
-
+          
         )
         
         
       )
-
+      
       
     })
-  
+    
   })
   
   observeEvent(input$tr_kom_to_p_ac, {
     
-
+    
     tryCatch({
       res <- dbSendQuery(con, paste0("SELECT skomentuj_film(", value_kp$id_k, ", '", input$tr_kom_to_p, "', ", input$uzytkownik, ", ", kom_p_id(), ");"))
       dbFetch(res)
@@ -1158,8 +1172,97 @@ function(input, output, session){
   })
   
   
+  ### komentarze użytkownika (nie działają guziki :( )
   
-
+  uz_koms <- reactive({
+    
+    as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_uz(", input$uzytkownik, ");")))
+    
+    
+  })
+  
+  
+  output$komu <- renderUI({
+    
+      if(nrow(uz_koms()) == 0){
+        showNotification("Nie napisałeś żadnego komentarza!", type = "warning")
+      }
+      else{
+        
+        faza <- uz_koms()$faza
+        a <- 1:nrow(uz_koms())
+        
+        
+        for(i in 1:nrow(uz_koms())){
+          
+          a[i] <- paste0("<div style = margin-left:", 10+30*faza[i], "px><span style=\"color:#FF337A\">", uz_koms()[i, nazwa_uz], " napisał: </span>", uz_koms()[i, tr])
+          
+          
+        }
+        
+        a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(uz_koms()),'ubutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
+                                                          onclick = 'Shiny.onInputChange(\"select_buttonu\",  this.id)'), "<br/><br/></div>")
+        
+        return(HTML(a))
+        
+        
+      }
+    
+  })
+  
+  
+  value_u <- reactiveValues(id_k = '')
+  
+  
+  observeEvent(input$select_buttonu, {
+    selectedRow <- as.numeric(strsplit(input$select_buttonu, "_")[[1]][2])
+    value_u$id_k <- uz_koms()[selectedRow, id_k]
+    
+  })
+  
+  
+  observeEvent(input$select_buttonu, ignoreInit = TRUE, {
+    
+    output$kom_to_u <- renderUI({
+      
+      showModal(
+        
+        modalDialog(
+          
+          
+          textInput("tr_kom_to_u", "Wprowadź treść komentarza"),
+          actionButton("tr_kom_to_u_ac", "Zatwierdź")
+          
+        )
+        
+        
+      )
+      
+      
+    })
+    
+  })
+  
+  observeEvent(input$tr_kom_to_u_ac, {
+    
+    
+    tryCatch({
+      res <- dbSendQuery(con, paste0("SELECT skomentuj_film(", value_u$id_k, ", '", input$tr_kom_to_u, "', ", input$uzytkownik, ", ", kom_u_id(), ");"))
+      dbFetch(res)
+      
+      if(dbHasCompleted(res)){
+        showNotification("Dodano komentarz!", type = "message")
+      }
+      
+      
+      dbClearResult(res)
+    },
+    error = function(err){
+      showNotification(paste0("Ups, coś poszło nie tak..."), type = 'warning')
+    })
+    
+    
+  })
   
   
   ######################################################
