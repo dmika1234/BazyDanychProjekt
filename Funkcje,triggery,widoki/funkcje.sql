@@ -863,6 +863,7 @@ BEGIN
 				k.id_odcinka
 			FROM komentarze k
 				WHERE k.id_produkcji = id_p
+				AND k.id_pop_kom IS NULL
 				
 			UNION
 			
@@ -906,6 +907,7 @@ BEGIN
 				TEXT(k.id_komentarza) AS id_klejone_kom
 			FROM komentarze k
 				WHERE k.id_odcinka = id_o
+				AND k.id_pop_kom IS NULL
 				
 			UNION
 			
