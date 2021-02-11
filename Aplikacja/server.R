@@ -67,7 +67,8 @@ function(input, output, session){
   
   
   uzytkownicy_konta <- reactive({
-    #input$uz_add_fin
+    input$refresh_uz
+    input$uz_add_fin
     dbGetQuery(con, paste0("SELECT * FROM uzytkownicy WHERE id_konta = '", id_konta(), "';"))
     
     
@@ -199,32 +200,25 @@ function(input, output, session){
                        fluidRow(
                          box(width = 12, 
                              tags$h2("Wybierz użytkownika", class = "text-center", style = "padding-top: 0; font-weight:600;"),
-                             radioGroupButtons(
-                               inputId = "uzytkownik",
-                               choiceNames =  uzytkownicy_konta()$nazwa,
-                               choiceValues = uzytkownicy_konta()$id_uzytkownika,
-                               size='lg',
-                               direction = "horizontal",
-                               justified = TRUE,
-                               width = '60%',
-                               individual = TRUE
-                             ),
+                             uiOutput('uz_butt'),
                              div(
                                style = "text-align: center;",
-                               actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger")),
-                             bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", size = "large", 
-                                     wellPanel(
-                                       textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
-                                       materialSwitch(
-                                         inputId = "if_baby_add",
-                                         label = "Czy użytkownik to dziecko?", 
-                                         status = "primary",
-                                         right = TRUE
-                                       ),
-                                       actionButton("uz_add_fin", "Dodaj"),
-                                       actionButton("refresh_uz", "Odśwież użytkowników")
-                                     )
-                             ))),
+                               actionBttn("uz_add", "Dodaj użytkownika", style = "pill", color = "danger"))
+                             )),
+                       
+                       bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", 
+                               wellPanel(
+                                 textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
+                                 materialSwitch(
+                                   inputId = "if_baby_add",
+                                   label = "Czy użytkownik to dziecko?", 
+                                   status = "primary",
+                                   right = TRUE
+                                 ),
+                                 actionButton("uz_add_fin", "Dodaj"),
+                                 actionButton("refresh_uz", "Odśwież użytkowników")
+                               )
+                       ),
                        
                        box(width = 6,  tags$h2(HTML(zaleglosci()), class = "text-center"),
                            
@@ -305,7 +299,8 @@ function(input, output, session){
                   box(width=10,
                       tags$h1("Twoje komentarze", class = "text-center"),
                       br(),
-                      htmlOutput('komu')
+                      htmlOutput('komu'),
+                      uiOutput('kom_to_u')
                   )
                   
                 )
@@ -429,6 +424,29 @@ function(input, output, session){
     }
   })
   #=========================================================================================================================================
+  
+  
+  
+  
+  output$uz_butt <- renderUI({
+    input$uz_add_fin
+    
+    radioGroupButtons(
+      inputId = "uzytkownik",
+      choiceNames =  uzytkownicy_konta()$nazwa,
+      choiceValues = uzytkownicy_konta()$id_uzytkownika,
+      size='lg',
+      direction = "horizontal",
+      justified = TRUE,
+      width = '60%',
+      individual = TRUE
+    )
+    
+    
+  })
+  
+  
+  
   
   
   
@@ -1039,9 +1057,10 @@ function(input, output, session){
   
   
   ####################KOmentarze###################################################
+  
+  
+  #Komentarze produkcja
   #----
-  
-  
   kom_p_id <- reactive({
     
     input$confirm_kom_fp
@@ -1062,6 +1081,7 @@ function(input, output, session){
     
     input$confirm_kom_fp
     input$tr_kom_to_p_ac
+    input$tr_kom_to_u_ac
     
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_p(", kom_p_id(), ");")))
     
@@ -1108,8 +1128,11 @@ function(input, output, session){
         
         a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
                                                           onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/></div>")
+      
+        HTML(a)
         
-        return(HTML(a))
+        actionButton('kom_only_p', "Skomentuj produkcję")
+        
         
         
       }
@@ -1170,11 +1193,19 @@ function(input, output, session){
     
     
   })
+  ###################
+  
+  
+  
+  
   
   
   ### komentarze użytkownika (nie działają guziki :( )
-  
+  #----
   uz_koms <- reactive({
+    
+    input$tr_kom_to_p_ac
+    input$tr_kom_to_u_ac
     
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_uz(", input$uzytkownik, ");")))
     
@@ -1263,7 +1294,7 @@ function(input, output, session){
     
     
   })
-  
+  ###############################
   
   ######################################################
   
