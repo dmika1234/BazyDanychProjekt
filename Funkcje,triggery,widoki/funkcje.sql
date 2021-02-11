@@ -859,7 +859,8 @@ BEGIN
 	RETURN QUERY 
 		SELECT k1.id_k, k1.tr, k1.data_kom, k1.id_p, k1.id_o, k1.tyt, k1.tyt_o, k1.faza, k1.nazwa_uz
 		FROM kom_uz(id) k1
-		JOIN (SELECT max(id_kl_k) FROM kom_uz(id) m GROUP BY m.id_k) AS k2 ON k1.id_kl_k = k2.max;
+		JOIN (SELECT max(m.faza), m.id_k FROM kom_uz(id) m GROUP BY m.id_k) AS k2 
+		ON k2.id_k = k1.id_k AND k1.faza = k2.max; 
 END;
 $$ LANGUAGE plpgsql;
 
