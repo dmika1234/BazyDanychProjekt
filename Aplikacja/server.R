@@ -1084,6 +1084,7 @@ function(input, output, session){
     input$confirm_kom_fp
     input$tr_kom_to_p_ac
     input$tr_kom_to_u_ac
+    input$tr_kom_to_p_ac2
     
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_p(", kom_p_id(), ");")))
     
@@ -1178,6 +1179,30 @@ function(input, output, session){
   }) 
   
   
+  observeEvent(input$tr_kom_to_p_ac2, {
+    
+    
+    tryCatch({
+      res <- dbSendQuery(con, paste0("SELECT skomentuj_film(NULL, '", input$tr_kom_to_p2, "', ", input$uzytkownik, ", ", kom_p_id(), ");"))
+      dbFetch(res)
+      
+      if(dbHasCompleted(res)){
+        showNotification("Dodano komentarz!", type = "message")
+      }
+      
+      
+      dbClearResult(res)
+    },
+    error = function(err){
+      showNotification(paste0("Ups, coś poszło nie tak..."), type = 'warning')
+    })
+    
+    
+  })
+  
+  
+  
+  
   
   observeEvent(input$select_buttonkp, ignoreInit = TRUE, {
     
@@ -1234,6 +1259,7 @@ function(input, output, session){
     
     input$tr_kom_to_p_ac
     input$tr_kom_to_u_ac
+    input$tr_kom_to_p_ac2
     
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_uz_2(", input$uzytkownik, ");")))
     
