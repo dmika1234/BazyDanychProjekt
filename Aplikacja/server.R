@@ -1132,14 +1132,15 @@ function(input, output, session){
         a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
                                                           onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/></div>")
       
-        HTML(a, '<button id="popup_prod" type="button" class="btn btn-default action-button shiny-bound-input">Skomentuj tą produkcję</button>')
+        HTML(a, '<button id="popup_prod" type="button" class="action-button bttn bttn-pill bttn-md bttn-danger bttn-no-outline"
+                  style="center">Skomentuj tą produkcję</button>')
         
         #HTML('<button id="popup" type="button" class="btn btn-default action-button shiny-bound-input">This button does not</button>')
         #actionButton('kom_only_p', "Skomentuj produkcję")
         
         
-        
-      }
+      
+      } 
     }
     
   })
