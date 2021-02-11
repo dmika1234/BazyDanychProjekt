@@ -294,13 +294,15 @@ function(input, output, session){
                               ),
                       br(),
                       htmlOutput('komp'),
-                      uiOutput('kom_to_p')
+                      uiOutput('kom_to_p'),
+                      uiOutput('kom_to_p2')
                   ),
                   box(width=10,
                       tags$h1("Twoje komentarze", class = "text-center"),
                       br(),
                       htmlOutput('komu'),
                       uiOutput('kom_to_u')
+                      
                   )
                   
                 )
@@ -1129,9 +1131,10 @@ function(input, output, session){
         a <- paste0(a, "&nbsp; &nbsp; &nbsp;", shinyInput(actionButton, nrow(prod_koms()),'kpbutton_', label =  HTML('odpowiedz &nbsp; <i class="far fa-comment"></i>'),
                                                           onclick = 'Shiny.onInputChange(\"select_buttonkp\",  this.id)'), "<br/><br/></div>")
       
-        HTML(a)
+        HTML(a, '<button id="popup_prod" type="button" class="btn btn-default action-button shiny-bound-input">Skomentuj tą produkcję</button>')
         
-        actionButton('kom_only_p', "Skomentuj produkcję")
+        #HTML('<button id="popup" type="button" class="btn btn-default action-button shiny-bound-input">This button does not</button>')
+        #actionButton('kom_only_p', "Skomentuj produkcję")
         
         
         
@@ -1149,6 +1152,31 @@ function(input, output, session){
     value_kp$id_k <- prod_koms()[selectedRow, id_k]
     
   })
+  
+  observeEvent(input$popup_prod, ignoreInit = TRUE, {
+    
+    output$kom_to_p2 <- renderUI({
+      
+      showModal(
+        modalDialog(
+          
+          
+          textInput("tr_kom_to_p2", "Wprowadź treść komentarza"),
+          actionButton("tr_kom_to_p_ac2", "Zatwierdź")
+          
+          
+          
+        )
+        
+        
+      )
+      
+      
+      
+    })
+  
+  }) 
+  
   
   
   observeEvent(input$select_buttonkp, ignoreInit = TRUE, {
@@ -1207,7 +1235,7 @@ function(input, output, session){
     input$tr_kom_to_p_ac
     input$tr_kom_to_u_ac
     
-    as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_uz(", input$uzytkownik, ");")))
+    as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_uz_2(", input$uzytkownik, ");")))
     
     
   })
@@ -1226,7 +1254,7 @@ function(input, output, session){
         
         for(i in 1:nrow(uz_koms())){
           
-          a[i] <- paste0("<div style = margin-left:", 10+30*faza[i], "px><span style=\"color:#FF337A\">", uz_koms()[i, nazwa_uz], " napisał: </span>", uz_koms()[i, tr])
+          a[i] <- paste0("<div style = margin-left:", 10+30*faza[i], "px><span style=\"color:#FF337A\">", uz_koms()[i, nazwa_uz], " skomentował &nbsp;<b><i>", uz_koms()[i, tyt] , "</i></b>: </span>", uz_koms()[i, tr])
           
           
         }
@@ -1248,7 +1276,7 @@ function(input, output, session){
   observeEvent(input$select_buttonu, {
     selectedRow <- as.numeric(strsplit(input$select_buttonu, "_")[[1]][2])
     value_u$id_k <- uz_koms()[selectedRow, id_k]
-    
+    value_u$id_p <- uz_koms()[selectedRow, id_p]
   })
   
   
@@ -1278,7 +1306,7 @@ function(input, output, session){
     
     
     tryCatch({
-      res <- dbSendQuery(con, paste0("SELECT skomentuj_film(", value_u$id_k, ", '", input$tr_kom_to_u, "', ", input$uzytkownik, ", ", kom_u_id(), ");"))
+      res <- dbSendQuery(con, paste0("SELECT skomentuj_film(", value_u$id_k, ", '", input$tr_kom_to_u, "', ", input$uzytkownik, ", ", value_u$id_p, ");"))
       dbFetch(res)
       
       if(dbHasCompleted(res)){
