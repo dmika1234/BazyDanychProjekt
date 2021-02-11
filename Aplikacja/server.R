@@ -1067,7 +1067,11 @@ function(input, output, session){
     
     input$confirm_kom_fp
     input$tr_kom_to_p_ac
-    
+    input$tr_kom_to_p_ac2
+    input$add_top_kom
+    input$add_top_kom3
+    input$add_serial_kom
+    input$add_film_kom
     id_p <- dbGetQuery(con, paste0("SELECT id_produkcji FROM produkcje WHERE tytul='", input$prod_kom_fp, "' LIMIT 1;"))$id_produkcji
     
   })
@@ -1079,12 +1083,18 @@ function(input, output, session){
   })
   
   
+  
+  
   prod_koms <- reactive({
     
     input$confirm_kom_fp
     input$tr_kom_to_p_ac
     input$tr_kom_to_u_ac
     input$tr_kom_to_p_ac2
+    input$add_top_kom
+    input$add_top_kom3
+    input$add_serial_kom
+    input$add_film_kom
     
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_p(", kom_p_id(), ");")))
     
@@ -1261,6 +1271,10 @@ function(input, output, session){
     input$tr_kom_to_p_ac
     input$tr_kom_to_u_ac
     input$tr_kom_to_p_ac2
+    input$add_top_kom
+    input$add_top_kom3
+    input$add_serial_kom
+    input$add_film_kom
     
     as.data.table(dbGetQuery(con, paste0("SELECT * FROM kom_uz_2(", input$uzytkownik, ");")))
     
