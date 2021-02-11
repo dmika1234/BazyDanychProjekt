@@ -209,12 +209,11 @@ function(input, output, session){
                        bsModal("uz_add_modal", "Dodanie użytkownika", "uz_add", 
                                wellPanel(
                                  textInput("new_uz_name", placeholder = "Nazwa", label = "Podaj nazwę użytkownika"),
-                                 materialSwitch(
+                                 awesomeCheckbox(
                                    inputId = "if_baby_add",
-                                   label = "Czy użytkownik to dziecko?", 
-                                   status = "primary",
-                                   right = TRUE
+                                   label = "Czy użytkownik to dziecko?"
                                  ),
+                               
                                  actionButton("uz_add_fin", "Dodaj"),
                                  actionButton("refresh_uz", "Odśwież użytkowników")
                                )
