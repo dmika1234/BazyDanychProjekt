@@ -804,7 +804,7 @@ $$ LANGUAGE plpgsql;
 			       
 -------- funkcja wypisująca komentarze danego użytkownika i wszystkie na nie odpowiadające
 
-CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) RETURNS TABLE(id_k TEXT, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), faza INTEGER) AS $$
+CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) RETURNS TABLE(id_k INTEGER, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), faza INTEGER, nazwa_uz VARCHAR(255)) AS $$
 BEGIN
 	RETURN QUERY 
 		WITH RECURSIVE kom_re AS (
@@ -816,7 +816,8 @@ BEGIN
 				0 as id_pop,
 				0 as phase,
 				k.data,
-				TEXT(k.id_komentarza) AS id_klejone_kom
+				TEXT(k.id_komentarza) AS id_klejone_kom,
+				k.id_uzytkownika
 			FROM komentarze k
 				WHERE k.id_uzytkownika = id
 				
@@ -830,17 +831,19 @@ BEGIN
 				k1.id_pop_kom as id_pop,
 				k2.phase + 1 as phase,
 				k1.data,
-				k2.id_klejone_kom  || '|' || k1.id_komentarza 
+				k2.id_klejone_kom  || '|' || k1.id_komentarza,
+				k1.id_uzytkownika
 			FROM komentarze k1
 				INNER JOIN kom_re k2
 			ON k1.id_pop_kom = k2.id_komentarza
 		)
 
 
-		SELECT k.id_klejone_kom, k.t, k.data, k.id_produkcji, k.id_odcinka, p.tytul, o.tytul_odcinka,  k.phase
+		SELECT k.id_komentarza, k.t, k.data, k.id_produkcji, k.id_odcinka, p.tytul, o.tytul_odcinka,  k.phase, u.nazwa
 		FROM kom_re k
 		JOIN produkcje p ON p.id_produkcji = k.id_produkcji
 		LEFT JOIN odcinki o ON o.id_odcinka = k.id_odcinka
+		JOIN uzytkownicy u ON u.id_uzytkownika = k.id_uzytkownika 
 		ORDER BY id_klejone_kom;
 END;
 $$ LANGUAGE plpgsql;
