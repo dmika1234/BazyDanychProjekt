@@ -112,7 +112,8 @@ $$ LANGUAGE plpgsql;
 							   
 DROP FUNCTION top_f;
 
-CREATE OR REPLACE FUNCTION top_f(id_kat INTEGER, id_u INTEGER) RETURNS TABLE(tytul VARCHAR(255), srednia DECIMAL(5, 2), id_p INTEGER) AS $$
+CREATE OR REPLACE FUNCTION top_f(id_kat INTEGER, id_u INTEGER) 
+			RETURNS TABLE(tytul VARCHAR(255), srednia DECIMAL(5, 2), id_p INTEGER) AS $$
 DECLARE
 	uzytkownik RECORD;
 BEGIN
@@ -124,7 +125,9 @@ BEGIN
 	IF(id_kat = 0) THEN
 		IF(uzytkownik.czy_dziecko = TRUE) THEN
 			RETURN QUERY
-				SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen", o.id_produkcji AS id_p
+				SELECT p.tytul AS "Tytul", 
+					round(avg(ocena), 2) AS "Srednia ocen", 
+					o.id_produkcji AS id_p
 				FROM oceny o
 					JOIN produkcje p ON o.id_produkcji = p.id_produkcji
 				WHERE p.czy_serial = FALSE 
@@ -136,7 +139,9 @@ BEGIN
 			
 		ELSE 
 			RETURN QUERY
-				SELECT p.tytul AS "Tytul", round(avg(ocena), 2) AS "Srednia ocen", o.id_produkcji AS id_p
+				SELECT p.tytul AS "Tytul", 
+					round(avg(ocena), 2) AS "Srednia ocen",
+					o.id_produkcji AS id_p
 				FROM oceny o
 					JOIN produkcje p ON o.id_produkcji = p.id_produkcji
 				WHERE p.czy_serial = FALSE
@@ -149,7 +154,9 @@ BEGIN
 	ELSE 
 		IF(uzytkownik.czy_dziecko = TRUE) THEN
 			RETURN QUERY 
-				SELECT p.tytul, round(avg(o.ocena), 2), p.id_produkcji  
+				SELECT p.tytul AS "Tytul", 
+					round(avg(ocena), 2) AS "Srednia ocen",
+					o.id_produkcji AS id_p
 				FROM produkcje p  
 					JOIN oceny o ON p.id_produkcji = o.id_produkcji  
 					JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
@@ -163,7 +170,9 @@ BEGIN
 	
 		ELSE 
 			RETURN QUERY 
-				SELECT p.tytul, round(avg(o.ocena), 2), p.id_produkcji  
+				SELECT p.tytul AS "Tytul", 
+					round(avg(ocena), 2) AS "Srednia ocen",
+					o.id_produkcji AS id_p
 				FROM produkcje p  
 					JOIN oceny o ON p.id_produkcji = o.id_produkcji  
 					JOIN w_kategorii w ON w.id_produkcji = p.id_produkcji  
