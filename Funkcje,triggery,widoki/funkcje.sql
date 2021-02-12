@@ -685,8 +685,12 @@ $$ LANGUAGE plpgsql;
 --funkcja szukania filmu										  
 
 DROP FUNCTION szukaj_f;
+											  
+											  
 CREATE OR REPLACE FUNCTION szukaj_f(tyt VARCHAR(255), id_u INTEGER) 
-RETURNS TABLE(id_p INTEGER, tytul VARCHAR(255), rezyser VARCHAR(255), kraj VARCHAR, czy_serial BOOLEAN, dlugosc_filmu TIME, rok_produkcji INTEGER, czy_dla_dzieci BOOLEAN) AS $$   
+RETURNS TABLE(id_p INTEGER, tytul VARCHAR(255), rezyser VARCHAR(255), 
+	      kraj VARCHAR, czy_serial BOOLEAN, dlugosc_filmu TIME, 
+	      rok_produkcji INTEGER, czy_dla_dzieci BOOLEAN) AS $$   
 DECLARE
 	uzytkownik RECORD;
 BEGIN
@@ -814,7 +818,10 @@ $$ LANGUAGE plpgsql;
 -------- funkcja wypisująca komentarze danego użytkownika i wszystkie na nie odpowiadające
 
 
-CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) RETURNS TABLE(id_kl_k TEXT, id_k INTEGER, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), faza INTEGER, nazwa_uz VARCHAR(255)) AS $$
+CREATE OR REPLACE FUNCTION kom_uz(id INTEGER) 
+	RETURNS TABLE(id_kl_k TEXT, id_k INTEGER, tr TEXT, data_kom DATE, 
+		      id_p INTEGER, id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), 
+		      faza INTEGER, nazwa_uz VARCHAR(255)) AS $$
 BEGIN
 	RETURN QUERY 
 		WITH RECURSIVE kom_re AS (
@@ -849,7 +856,8 @@ BEGIN
 		)
 
 
-		SELECT k.id_klejone_kom, k.id_komentarza, k.t, k.data, k.id_produkcji, k.id_odcinka, p.tytul, o.tytul_odcinka,  k.phase, u.nazwa
+		SELECT k.id_klejone_kom, k.id_komentarza, k.t, k.data, 
+			k.id_produkcji, k.id_odcinka, p.tytul, o.tytul_odcinka, k.phase, u.nazwa
 		FROM kom_re k
 		JOIN produkcje p ON p.id_produkcji = k.id_produkcji
 		LEFT JOIN odcinki o ON o.id_odcinka = k.id_odcinka
@@ -863,10 +871,14 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kom_uz_2(id INTEGER) RETURNS TABLE(id_k INTEGER, tr TEXT, data_kom DATE, id_p INTEGER, id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), faza INTEGER, nazwa_uz VARCHAR(255)) AS $$
+CREATE OR REPLACE FUNCTION kom_uz_2(id INTEGER) 
+	RETURNS TABLE(id_k INTEGER, tr TEXT, data_kom DATE, id_p INTEGER, 
+		      id_o INTEGER, tyt VARCHAR(255), tyt_o VARCHAR(255), 
+		      faza INTEGER, nazwa_uz VARCHAR(255)) AS $$
 BEGIN
 	RETURN QUERY 
-		SELECT k1.id_k, k1.tr, k1.data_kom, k1.id_p, k1.id_o, k1.tyt, k1.tyt_o, k1.faza, k1.nazwa_uz
+		SELECT k1.id_k, k1.tr, k1.data_kom, k1.id_p, k1.id_o, 
+			k1.tyt, k1.tyt_o, k1.faza, k1.nazwa_uz
 		FROM kom_uz(id) k1
 		JOIN (SELECT max(m.faza), m.id_k FROM kom_uz(id) m GROUP BY m.id_k) AS k2 
 		ON k2.id_k = k1.id_k AND k1.faza = k2.max; 
@@ -879,7 +891,9 @@ $$ LANGUAGE plpgsql;
 			       
 --funkcja wypisująca komentarze do produkcji
 
-CREATE OR REPLACE FUNCTION kom_p(id_p INTEGER) RETURNS TABLE(id_k INTEGER, id_uz INTEGER, nazwa_uz VARCHAR(255), tr TEXT, data_kom DATE, faza INTEGER) AS $$
+CREATE OR REPLACE FUNCTION kom_p(id_p INTEGER) 
+	RETURNS TABLE(id_k INTEGER, id_uz INTEGER, nazwa_uz VARCHAR(255), 
+		      tr TEXT, data_kom DATE, faza INTEGER) AS $$
 BEGIN
 	RETURN QUERY 
 		WITH RECURSIVE kom_re AS (
